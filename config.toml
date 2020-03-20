@@ -1,0 +1,29 @@
+[Server]
+Listen = ":19098"
+AppName = "ScreenServer-ZH-FS-TEST"
+Env = "TEST"
+[Auth]
+Enable = false
+Secret = "7ec164764dacaea974eae08966deef87"
+Skips = [
+]
+[Auth.Accounts]
+#key = secret
+e76cb1d7079fdaf49422fe711bfd98c6 = "e10adc3949ba59abbe56e057f20f883e"
+
+[Database]
+Enable = false
+UserPassword = "root:123456"
+DB = "demo"
+[Database.Write]
+HostPort = "tcp(172.20.10.19:33061)"
+[Database.Read]
+HostPort = "tcp(172.20.10.19:33061)"
+[Database.Conn]
+MaxLifeTime = 7200
+MaxIdle = 50
+MaxOpen = 50
+
+[Log]
+FilePath = "./log"
+FileName = "fastgo"

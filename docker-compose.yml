@@ -1,0 +1,18 @@
+version: '3.2'
+
+services:
+  fast-go:
+    container_name: fast-go
+    restart: always
+    image: harbor.cn/group/fastgo:0.0.1
+    network_mode: "host"
+    logging:
+      options:
+        max-size: "1g"
+        max-file: "2"
+    volumes:
+      - ./config.toml:/root/config.toml
+      - ./log:/root/log
+    entrypoint:
+      - fastgo
+      - server
