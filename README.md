@@ -22,9 +22,12 @@
  docker-compose up #docker-compose运行,需提前替换docker-compose.yml中的镜像
 ```
 
-####如何获取
+#### 如何获取
 github仓库地址: https://github.com/ucanme/fastgo.git
 欢迎批评指正，轮子会不断升级维护。使用交流QQ群: 15895722
 
 #### 优惠福利
-阿里云服务福利疫情最后几天活动 2核8g内存40G磁盘5m带宽三年1399，0.6折价格可做开发机，学习机，业务机，技术在于折腾。购买地址：https://www.aliyun.com/minisite/goods?userCode=b2d0no2s   
+阿里云服务福利疫情最后几天活动 2核8g内存40G磁盘5m带宽三年1399，0.6折价格可做开发机，学习机，业务机，技术在于折腾。购买地址：https://www.aliyun.com/minisite/goods?userCode=b2d0no2s  
+
+
+
