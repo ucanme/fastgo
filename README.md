@@ -8,7 +8,7 @@
 4. 基于gorm，框架内含db初始化工具。
 5. 基于toml配置文件，含有完整解析类库
 6. 内含http请求工具类库。
-7. 使用go mod包管理工具，不依赖GOPATH的设置
+7. 使用go mod包管理工具，不依赖GOPATH的设置，需要go1.13以上版本
 8. 内含Dockerfile与Makefile支持一键编译docker镜像，内含docker-compose.yml示例支持一键容器运行
 
 #### 基本使用
