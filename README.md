@@ -11,7 +11,7 @@
 7. 使用go mod包管理工具，不依赖GOPATH的设置
 8. 内含Dockerfile与Makefile支持一键编译docker镜像，内涵docker-compose.yml示例支持一键容器运行
 
-#### 基本实用
+#### 基本使用
 
 ```
 #基于命令行实用
