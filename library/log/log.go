@@ -1,14 +1,13 @@
 package log
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/lestrrat-go/file-rotatelogs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 	"github.com/ucanme/fastgo/conf"
-	"os"
 	"path"
+	"path/filepath"
 	"reflect"
 	"time"
 )
@@ -51,39 +50,38 @@ var errorLogger *logrus.Logger
 
 func Init() {
 	// 日志文件
+
+	conf.Config.Log.FilePath, _ = filepath.Abs(conf.Config.Log.FilePath)
 	noticefileName := path.Join(conf.Config.Log.FilePath, conf.Config.Log.FileName+".log")
 	warningfileName := path.Join(conf.Config.Log.FilePath, conf.Config.Log.FileName+".wf.log")
 	errorfileName := path.Join(conf.Config.Log.FilePath, conf.Config.Log.FileName+".error.log")
+	//
+	//// 写入文件
+	//noticeFile, err := os.OpenFile(noticefileName, os.O_APPEND|os.O_CREATE|os.O_RDWR, os.ModePerm)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//warningFile, err := os.OpenFile(warningfileName, os.O_APPEND|os.O_CREATE|os.O_RDWR, os.ModePerm)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//errorFile, err := os.OpenFile(errorfileName, os.O_APPEND|os.O_CREATE|os.O_RDWR, os.ModePerm)
+	//if err != nil {
+	//	panic(err)
+	//}
 
-	// 写入文件
-	noticeFile, err := os.OpenFile(noticefileName, os.O_APPEND|os.O_CREATE|os.O_RDWR, os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
-	warningFile, err := os.OpenFile(warningfileName, os.O_APPEND|os.O_CREATE|os.O_RDWR, os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
-	errorFile, err := os.OpenFile(errorfileName, os.O_APPEND|os.O_CREATE|os.O_RDWR, os.ModePerm)
-	if err != nil {
-		panic(err)
-	}
-
-	if err != nil {
-		fmt.Println("err", err)
-	}
+	//if err != nil {
+	//	fmt.Println("err", err)
+	//}
 	// 实例化
 	noticeLogger = logrus.New()
 	noticeLogger.SetFormatter(&logrus.JSONFormatter{})
-	noticeLogger.Out = noticeFile
 
 	warningLogger = logrus.New()
 	warningLogger.SetFormatter(&logrus.JSONFormatter{})
-	warningLogger.Out = warningFile
 
 	errorLogger = logrus.New()
 	errorLogger.SetFormatter(&logrus.JSONFormatter{})
-	errorLogger.Out = errorFile
 
 	//设置日志级别
 	//设置输出
@@ -91,7 +89,7 @@ func Init() {
 	// 设置 rotatelogs
 	noticeWriter, err := rotatelogs.New(
 		// 分割后的文件名称
-		".%Y%m%d"+noticefileName,
+		noticefileName+".%Y%m%d",
 
 		// 生成软链，指向最新日志文件
 		rotatelogs.WithLinkName(noticefileName),
@@ -106,10 +104,11 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-	logrus.SetOutput(noticeWriter)
+	noticeLogger.SetOutput(noticeWriter)
+
 	warningWriter, err := rotatelogs.New(
 		// 分割后的文件名称
-		".%Y%m%d"+warningfileName,
+		warningfileName+".%Y%m%d",
 
 		// 生成软链，指向最新日志文件
 		rotatelogs.WithLinkName(noticefileName),
@@ -123,11 +122,11 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-	logrus.SetOutput(warningWriter)
+	warningLogger.SetOutput(warningWriter)
 
 	errorWriter, err := rotatelogs.New(
 		// 分割后的文件名称
-		".%Y%m%d"+errorfileName,
+		errorfileName+".%Y%m%d",
 
 		// 生成软链，指向最新日志文件
 		rotatelogs.WithLinkName(noticefileName),
@@ -141,7 +140,9 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-	logrus.SetOutput(errorWriter)
+
+	errorLogger.SetOutput(errorWriter)
+	LogNotice(map[string]interface{}{"hello": "world"})
 }
 
 func LogNotice(data map[string]interface{}) {

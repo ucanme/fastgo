@@ -1,4 +1,4 @@
-CURRENT_GIT_GROUP 	:= github.com/ucanmeme/fastgo
+CURRENT_GIT_GROUP 	:= github.com/ucanme/fastgo
 CURRENT_GIT_REPO  	:= fastgo
 COMMONENVVAR		= GOOS=linux GOARCH=amd64
 BUILDENVVAR			= CGO_ENABLED=0

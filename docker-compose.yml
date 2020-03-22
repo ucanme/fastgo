@@ -4,7 +4,7 @@ services:
   fast-go:
     container_name: fast-go
     restart: always
-    image: harbor.cn/group/fastgo:0.0.1
+    image: harbor.cn/group/fastgo:NO_TAG.1.2132ffa
     network_mode: "host"
     logging:
       options:
