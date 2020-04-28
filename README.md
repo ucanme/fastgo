@@ -30,3 +30,14 @@ github仓库地址: https://github.com/ucanme/fastgo.git
 阿里云服务福利疫情最后几天活动 2核8g内存40G磁盘5m带宽三年1399，0.6折价格可做开发机，学习机，业务机，技术在于折腾。购买地址：https://www.aliyun.com/minisite/goods?userCode=b2d0no2s  
 
 
+#### 最近更新:
+新增Trace分支,支持requestId的track功能。
+
+通过修改源代码获取goroutine id,可以尝试直接修改源代码src/runtime/runtime2.go中添加Goid函数，将goid暴露给应用层：
+```
+func Goid() int64 {
+    _g_ := getg()
+    return _g_.goid
+}
+```
+
