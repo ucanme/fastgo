@@ -1,14 +1,15 @@
 package log
 
 import (
+	"github.com/ucanme/fastgo/conf"
 	"github.com/gin-gonic/gin"
 	"github.com/lestrrat-go/file-rotatelogs"
 	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
-	"github.com/ucanme/fastgo/conf"
 	"path"
 	"path/filepath"
-	"reflect"
+	"runtime"
+	"sync"
 	"time"
 )
 
@@ -20,28 +21,33 @@ type logInfo struct {
 
 //var LogChan = make(chan (logInfo), 10000)
 
+var gIdRquestIdMap = sync.Map{}
 const REQUEST_ID = "request_id"
 
 //设置请求request_id
-func SetRequestID(c *gin.Context) string {
-	requestId := c.GetHeader("request_id")
+func SetRequestId(c *gin.Context) string {
+	requestId := c.GetHeader(REQUEST_ID)
 	if len(requestId) < 20 {
-		requestId = uuid.NewV4().String()
+		requestId = GetRequestId()
 	}
-
-	c.Set("request_id", requestId)
 	return requestId
 }
 
 //获取请求request_id
-func GetRequestID(c *gin.Context) string {
-	v, ok := c.Get(REQUEST_ID)
-	if ok && reflect.TypeOf(v).Kind() == reflect.String {
+func GetRequestId() string {
+	gid := runtime.Goid()
+	v,ok := gIdRquestIdMap.Load(gid)
+	if ok {
 		return v.(string)
 	}
 	requestId := uuid.NewV4().String()
-	c.Set(REQUEST_ID, requestId)
+	gIdRquestIdMap.Store(gid,requestId)
 	return requestId
+}
+
+func FreeRequestId()  {
+	gid := runtime.Goid()
+	gIdRquestIdMap.Delete(gid)
 }
 
 var noticeLogger *logrus.Logger

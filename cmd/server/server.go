@@ -8,6 +8,7 @@ import (
 	v1 "github.com/ucanme/fastgo/controller/v1"
 	"github.com/ucanme/fastgo/cron"
 	"github.com/ucanme/fastgo/library/db"
+	"github.com/ucanme/fastgo/library/log"
 	"github.com/urfave/cli"
 	"net"
 	"net/http"
@@ -37,6 +38,7 @@ var Server = cli.Command{
 
 func run(c *cli.Context) {
 	conf.Init(c.String("conf"), c.String("args"))
+	log.Init()
 	db.Init()
 
 	srv := &http.Server{

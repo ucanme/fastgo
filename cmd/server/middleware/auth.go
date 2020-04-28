@@ -125,7 +125,7 @@ func Auth() gin.HandlerFunc {
 
 func renderAuthFail(c *gin.Context) {
 	jsonObj := map[string]interface{}{
-		"request_id": clog.GetRequestID(c),
+		"request_id": clog.GetRequestId(),
 		"error_no":   400,
 		"error_msg":  "auth failed",
 	}

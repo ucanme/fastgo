@@ -1,6 +1,6 @@
 [Server]
 Listen = ":19098"
-AppName = "ScreenServer-ZH-FS-TEST"
+AppName = "fastgo"
 Env = "TEST"
 [Auth]
 Enable = false
@@ -16,9 +16,9 @@ Enable = false
 UserPassword = "root:123456"
 DB = "demo"
 [Database.Write]
-HostPort = "tcp(172.20.10.19:33061)"
+HostPort = "tcp(127.0.0.1:33061)"
 [Database.Read]
-HostPort = "tcp(172.20.10.19:33061)"
+HostPort = "tcp(127.0.0.1:33061)"
 [Database.Conn]
 MaxLifeTime = 7200
 MaxIdle = 50

@@ -11,7 +11,7 @@ func Response(c *gin.Context, code int, msg string, data interface{}) {
 		"data":       data,
 		"error_no":   code,
 		"error_msg":  msg,
-		"request_id": log.GetRequestID(c),
+		"request_id": log.GetRequestId(),
 	})
 }
 

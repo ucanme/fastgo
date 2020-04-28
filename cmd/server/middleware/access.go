@@ -28,12 +28,14 @@ func Access() gin.HandlerFunc {
 		blw := &bodyLogWriter{body: &bytes.Buffer{}, ResponseWriter: c.Writer}
 		c.Writer = blw
 
+		requestId := clog.SetRequestId(c)
 		start := time.Now()
 		fields := map[string]interface{}{
 			"log_type": "access",
 			"method":   c.Request.Method,
 			"latency":  time.Since(start) / time.Microsecond,
 			"path":     c.Request.URL.String(),
+			"request_id": requestId,
 		}
 
 		if c.Request.Method == "POST" {
@@ -52,9 +54,7 @@ func Access() gin.HandlerFunc {
 		var out struct {
 			RequestID string `json:"request_id"`
 		}
-		out.RequestID = clog.GetRequestID(c)
-
-		fields["request_id"] = out.RequestID
+		out.RequestID = requestId
 		fields["response"] = string(blw.body.Bytes())
 
 		json.Unmarshal(blw.body.Bytes(), &out)
