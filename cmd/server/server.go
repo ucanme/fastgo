@@ -117,6 +117,6 @@ func GetEngine() *gin.Engine {
 func V1(r gin.IRouter) {
 	g := r.Group("/v1")
 	{
-		g.GET("/demo", v1.Demo)
+		g.POST("/demo", v1.Login)
 	}
 }
