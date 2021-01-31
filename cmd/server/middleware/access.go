@@ -3,7 +3,6 @@ package middleware
 import (
 	"bytes"
 	"fmt"
-	"github.com/ucanme/fastgo/library/session"
 	"io/ioutil"
 	"net"
 	"time"

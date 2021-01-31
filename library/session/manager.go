@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/ucanme/fastgo/library/session/common"
 	"io"
 	"net/http"
@@ -44,13 +45,13 @@ func (manager *Manager) sessionId() string {
 
 
 //根据当前请求的cookie中判断是否存在有效的session, 不存在则创建
-func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (session common.Session) {
+func (manager *Manager) SessionStart(c *gin.Context) (session common.Session) {
 	//为该方法加锁
 	manager.lock.Lock()
 	defer manager.lock.Unlock()
 	//获取 request 请求中的 cookie 值
-	cookie, err := r.Cookie(manager.cookieName)
-	if err != nil || cookie.Value == "" {
+	cookie, err := c.Cookie(manager.cookieName)
+	if err != nil || cookie == "" {
 		sid := manager.sessionId()
 		session, _ = manager.provider.SessionInit(sid)
 		cookie := http.Cookie{
@@ -59,26 +60,25 @@ func (manager *Manager) SessionStart(w http.ResponseWriter, r *http.Request) (se
 			Path: "/",
 			HttpOnly: true,
 			MaxAge: int(manager.maxLifeTime)}
-
-		http.SetCookie(w, &cookie) //将新的cookie设置到响应中
+		c.SetCookie(cookie.Name,cookie.Value,cookie.MaxAge,cookie.Path,"",true,true)
 	} else {
-		sid, _ := url.QueryUnescape(cookie.Value)
+		sid, _ := url.QueryUnescape(cookie)
 		session, _ = manager.provider.SessionRead(sid)
 	}
 	return
 }
 
 // SessionDestroy 注销 Session
-func (manager *Manager) SessionDestroy(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie(manager.cookieName)
-	if err != nil || cookie.Value == "" {
+func (manager *Manager) SessionDestroy(c *gin.Context) {
+	cookie, err := c.Cookie(manager.cookieName)
+	if err != nil || cookie == "" {
 		return
 	}
 
 	manager.lock.Lock()
 	defer manager.lock.Unlock()
 
-	manager.provider.SessionDestroy(cookie.Value)
+	manager.provider.SessionDestroy(cookie)
 	expiredTime := time.Now()
 	newCookie := http.Cookie{
 		Name: manager.cookieName,
@@ -86,7 +86,7 @@ func (manager *Manager) SessionDestroy(w http.ResponseWriter, r *http.Request) {
 		Expires: expiredTime,
 		MaxAge: -1,  //会话级cookie
 	}
-	http.SetCookie(w, &newCookie)
+	c.SetCookie(newCookie.Name,newCookie.Value,newCookie.MaxAge,newCookie.Path,"",true,true)
 }
 
 

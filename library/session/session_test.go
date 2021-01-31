@@ -8,7 +8,7 @@ import (
 
 func TestNewProvider(t *testing.T) {
 	redis.Init()
-	p := NewProvider("test","redis")
+	p := NewProvider("redis")
 	if p==nil{
 		t.Logf("%s","provider is nil")
 	}

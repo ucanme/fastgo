@@ -7,6 +7,7 @@ import (
 	"github.com/ucanme/fastgo/conf"
 	v1 "github.com/ucanme/fastgo/controller/v1"
 	"github.com/ucanme/fastgo/cron"
+	"github.com/ucanme/fastgo/internal/session"
 	"github.com/ucanme/fastgo/library/db"
 	"github.com/ucanme/fastgo/library/log"
 	"github.com/urfave/cli"
@@ -40,6 +41,8 @@ func run(c *cli.Context) {
 	conf.Init(c.String("conf"), c.String("args"))
 	db.Init()
 	log.Init()
+
+	session.Init()
 
 	srv := &http.Server{
 		Handler:      GetEngine(),
@@ -117,6 +120,6 @@ func GetEngine() *gin.Engine {
 func V1(r gin.IRouter) {
 	g := r.Group("/v1")
 	{
-		g.POST("/demo", v1.Login)
+		g.POST("/login", v1.Login)
 	}
 }

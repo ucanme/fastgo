@@ -34,19 +34,11 @@ func runInitDB(c *cli.Context) {
 	create := db.DB().Set("gorm:table_options", "ENGINE=InnoDB CHARSET=utf8mb4")
 	//create.CreateTable()
 
-	db.DB().DropTableIfExists(
-		&models.Demo{},
-	//&models.LoginRecord{},
-	//&models.RegisteredCar{},
-	//&models.User{},
-	//&models.ParkInfo{},
-	//&models.VrModel{},
-	//&models.Store{},
-	////&models.Device{},
-	//&models.NavigateRecord{},
-	)
+	//db.DB().DropTableIfExists(
+	//	&models.User{},
+	//)
 
 	create.AutoMigrate(
-		&models.Demo{},
+		&models.User{},
 	)
 }

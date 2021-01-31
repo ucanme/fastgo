@@ -30,7 +30,7 @@ func RegisterProvider(name string, provider Provider) {
 
 
 //生成新的provider
-func NewProvider(name string,provider_type string) Provider {
+func NewProvider(provider_type string) Provider {
 	var provider Provider
 	switch provider_type {
 	case "redis":

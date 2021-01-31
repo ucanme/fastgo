@@ -2,6 +2,7 @@ package redis
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/garyburd/redigo/redis"
 	uuid "github.com/satori/go.uuid"
 	"github.com/ucanme/fastgo/library/session/common"
@@ -13,12 +14,14 @@ type RedisStore struct {
 var connPool *redis.Pool
 func Init()  {
 	connPool = Conn()
-
 }
 
 func (s RedisStore)Set(key string, value common.Session) error  {
 	data,_ := json.Marshal(value)
-	_,err :=connPool.Get().Do("set","key",string(data))
+	fmt.Println("sesionset")
+	fmt.Println("aaa",connPool.Get())
+	fmt.Println("sesionset")
+	_,err :=connPool.Get().Do("set",key,string(data))
 	return err
 }
 

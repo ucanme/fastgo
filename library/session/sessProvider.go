@@ -16,7 +16,6 @@ func (s *sessProvider) SessionInit(sid string) (common.Session, error) {
 		Value:          uuid.NewV1().String(),
 		LastAccessTime: time.Now().UnixNano()/1e6,
 	}
-
 	err := (*s.session).Set(sid,sess)
 	return sess ,err
 }

@@ -12,9 +12,9 @@ Skips = [
 e76cb1d7079fdaf49422fe711bfd98c6 = "e10adc3949ba59abbe56e057f20f883e"
 
 [Database]
-Enable = false
+Enable = true
 UserPassword = "root:123456"
-DB = "demo"
+DB = "fast"
 [Database.Write]
 HostPort = "tcp(127.0.0.1:3306)"
 [Database.Read]
