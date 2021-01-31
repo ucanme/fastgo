@@ -3,6 +3,7 @@ package middleware
 import (
 	"bytes"
 	"fmt"
+	"github.com/ucanme/fastgo/library/session"
 	"io/ioutil"
 	"net"
 	"time"
@@ -27,7 +28,6 @@ func Access() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		blw := &bodyLogWriter{body: &bytes.Buffer{}, ResponseWriter: c.Writer}
 		c.Writer = blw
-
 		start := time.Now()
 		fields := map[string]interface{}{
 			"log_type": "access",
@@ -35,6 +35,8 @@ func Access() gin.HandlerFunc {
 			"latency":  time.Since(start) / time.Microsecond,
 			"path":     c.Request.URL.String(),
 		}
+
+
 
 		if c.Request.Method == "POST" {
 			reqBody, err := ioutil.ReadAll(c.Request.Body)
