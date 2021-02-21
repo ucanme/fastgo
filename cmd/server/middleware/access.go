@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"net"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -35,13 +35,29 @@ func Access() gin.HandlerFunc {
 			"path":     c.Request.URL.String(),
 		}
 
+		//origin := c.Request.Header.Get("Origin")
+		//if origin != ""  {
+
+		//	c.Header("Access-Control-Allow-Origin", "http://localhost:18089")
+		////	c.Header("Access-Control-Allow-Origin", "*")
+		//	c.Header("Access-Control-Max-Age", "3600")
+		//	c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE")
+		//	c.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
+		//	c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
+		//	c.Header("Access-Control-Allow-Credentials", "true")
+		//	c.Set("content-type", "application/json")
+		////}
+
+
+		if c.Request.Method == "OPTIONS"{
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
 
 
 		if c.Request.Method == "POST" {
 			reqBody, err := ioutil.ReadAll(c.Request.Body)
 			c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
-
-			fmt.Println("requsetData", reqBody)
 			if err != nil {
 				fields["err_info"] = "dump_request_error" + err.Error()
 			} else {

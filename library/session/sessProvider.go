@@ -13,7 +13,7 @@ type sessProvider struct {
 func (s *sessProvider) SessionInit(sid string) (common.Session, error) {
 	sess := common.Session{
 		Sid:            sid,
-		Value:          uuid.NewV1().String(),
+		Value:          uuid.NewV4().String(),
 		LastAccessTime: time.Now().UnixNano()/1e6,
 	}
 	err := (*s.session).Set(sid,sess)

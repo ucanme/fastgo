@@ -1,9 +1,10 @@
 version: '3.2'
-
 services:
   fast-go:
     container_name: fast-go
     restart: always
+    ports: 
+     - 19098:19098
     image: harbor.cn/group/fastgo:NO_TAG.1.2132ffa
     network_mode: "host"
     logging:
