@@ -6,5 +6,6 @@ type Article struct {
 	gorm.Model
 	Content string `json:"text"  gorm:"text"`
 	CateId int `json:"cate_id" gorm:"int"`
+	ImgUrl string `json:"img_url"`
 }
 

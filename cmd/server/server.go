@@ -124,5 +124,7 @@ func V1(r gin.IRouter) {
 		g.POST("/article/add",v1.AddArticle)
 		g.POST("/article/delete",v1.DeleteArticle)
 		g.POST("/article/get",v1.GetArticle)
+		g.POST("/article/list",v1.ListArticle)
+
 	}
 }

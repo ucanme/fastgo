@@ -52,6 +52,7 @@ func GetArticle(c *gin.Context)  {
 type addReq struct {
 	CateId int `json:"cate_id"`
 	Content string `json:"content"`
+	ImgUrl string `json:"img_url"`
 }
 func AddArticle(c *gin.Context)  {
 	input := addReq{}
@@ -63,6 +64,7 @@ func AddArticle(c *gin.Context)  {
 		Model:   gorm.Model{},
 		Content: input.Content,
 		CateId:  input.CateId,
+		ImgUrl: input.ImgUrl,
 	}
 	err := db.DB().Save(&a).Error
 	if err!=nil{
