@@ -14,11 +14,11 @@ e76cb1d7079fdaf49422fe711bfd98c6 = "e10adc3949ba59abbe56e057f20f883e"
 [Database]
 Enable = true
 UserPassword = "root:123456"
-DB = "fast"
+DB = "we"
 [Database.Write]
-HostPort = "tcp(127.0.0.1:3306)"
+HostPort = "tcp(49.233.193.41:33061)"
 [Database.Read]
-HostPort = "tcp(127.0.0.1:3306)"
+HostPort = "tcp(49.233.193.41:33061)"
 [Database.Conn]
 MaxLifeTime = 7200
 MaxIdle = 50
@@ -27,3 +27,7 @@ MaxOpen = 50
 [Log]
 FilePath = "./log"
 FileName = "fastgo"
+
+[UploadDir]
+Dir = "./files"
+Host = "http://127.0.0.1:19098/v1/assets/"

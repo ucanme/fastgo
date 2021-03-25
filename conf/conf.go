@@ -19,6 +19,10 @@ type ConfigTOML struct {
 		FilePath string
 		FileName string
 	}
+	UploadDir struct{
+		Dir string
+		Host string
+	}
 }
 
 var Config *ConfigTOML

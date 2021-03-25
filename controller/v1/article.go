@@ -39,7 +39,7 @@ func GetArticle(c *gin.Context)  {
 		return
 	}
 	as := []models.Article{}
-	err := db.DB().Order("created_at desc").Where("cate_id=?",input.Id).Find(&as).Error
+	err := db.DB().Order("created_at desc").Where("id=?",input.Id).Find(&as).Error
 	if err==gorm.ErrRecordNotFound{
 		response.Fail(c,400,"no article")
 	}
