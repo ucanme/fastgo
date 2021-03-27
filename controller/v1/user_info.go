@@ -18,6 +18,7 @@ type RegisterReq struct {
 	PhoneNum string `json:"phone_num"`
 	AvatarUrl string `json:"avatar_url"`
 	OpenId string `json:"open_id"`
+	Score int `json:"score"`
 }
 
 func Register(c *gin.Context)  {
@@ -27,18 +28,18 @@ func Register(c *gin.Context)  {
 		return
 	}
 
-	v,ok := c.Get("session")
-	if !ok && input.OpenId == "" {
-		response.Fail(c, 400, "未登陆")
-		return
-	}
-	if ok {
-		data,ok1 :=  v.(SessionData)
-		if ok1{
-			input.OpenId = data.OpenId
-		}
-
-	}
+	//v,ok := c.Get("session")
+	//if !ok && input.OpenId == "" {
+	//	response.Fail(c, 400, "未登陆")
+	//	return
+	//}
+	//if ok {
+	//	data,ok1 :=  v.(SessionData)
+	//	if ok1{
+	//		input.OpenId = data.OpenId
+	//	}
+	//
+	//}
 
 	err :=doRegister(input.OpenId,input.PhoneNum,input.AvatarUrl)
 	if err!=nil{

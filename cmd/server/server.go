@@ -120,14 +120,13 @@ func GetEngine() *gin.Engine {
 func V1(r gin.IRouter) {
 	g := r.Group("/v1")
 	{
-		g.POST("/login", v1.Login)
 		g.POST("/article/add",v1.AddArticle)
 		g.POST("/article/delete",v1.DeleteArticle)
 		g.POST("/article/get",v1.GetArticle)
 		g.POST("/article/list",v1.ListArticle)
 		g.POST("/file/upload",v1.DeviceUpload)
 		g.Static("/assets",conf.Config.UploadDir.Dir)
-		g.POST("v1/userinfo",v1.Register)
-		g.POST("/v1/login",v1.Login)
+		g.POST("/userinfo",v1.Register)
+		g.POST("/login",v1.Login)
 	}
 }
