@@ -77,3 +77,15 @@ func doRegister(openId,phoneNum,avatarUrl string,score int) error {
 	}
 	return nil;
 }
+
+func UserList(c *gin.Context)  {
+	us := []models.User{}
+	err := db.DB().Find(&us).Error
+	if err!=nil{
+		if err!=nil{
+			response.Fail(c,400,"失败")
+			return
+		}
+	}
+	response.Success(c,us)
+}
