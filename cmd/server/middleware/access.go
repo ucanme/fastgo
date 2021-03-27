@@ -2,6 +2,9 @@ package middleware
 
 import (
 	"bytes"
+	"github.com/ucanme/fastgo/controller/response"
+	v1 "github.com/ucanme/fastgo/controller/v1"
+	"github.com/ucanme/fastgo/internal/session"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -48,12 +51,23 @@ func Access() gin.HandlerFunc {
 		//	c.Set("content-type", "application/json")
 		////}
 
-
 		if c.Request.Method == "OPTIONS"{
 			c.AbortWithStatus(http.StatusNoContent)
 			return
 		}
 
+		s := session.Manager.SessionStart(c,"")
+		if s.Value == ""{
+			response.Response(c,400,"没有登陆",nil)
+			return
+		}
+		sVal := v1.SessionData{}
+		err := json.Unmarshal([]byte(s.Value),&sVal)
+		if err != nil{
+			response.Response(c,400,"没有登陆",nil)
+			return
+		}
+		c.Set("session",sVal)
 
 		if c.Request.Method == "POST" {
 			reqBody, err := ioutil.ReadAll(c.Request.Body)
