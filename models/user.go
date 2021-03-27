@@ -10,5 +10,5 @@ type User struct {
 	LastLoginTime int64 `json:"last_login_time" gorm:"type:varchar(64) not null"`
 	AvatarUrl string `json:"avatar_url" gorm:"type:varchar(128) not null"`
 	Status int8 `json:"status" gorm:"type:tinyint not null"`
-	Score int64  `json:"avatar_url" gorm:"type:varchar(128) not null"`
+	Score int  `json:"avatar_url" gorm:"type:varchar(128) not null"`
 }

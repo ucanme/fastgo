@@ -41,7 +41,7 @@ func Register(c *gin.Context)  {
 	//
 	//}
 
-	err :=doRegister(input.OpenId,input.PhoneNum,input.AvatarUrl)
+	err :=doRegister(input.OpenId,input.PhoneNum,input.AvatarUrl,input.Score)
 	if err!=nil{
 		response.Fail(c,400,"注册失败")
 		return
@@ -50,7 +50,7 @@ func Register(c *gin.Context)  {
 }
 
 //用户注册
-func doRegister(openId,phoneNum,avatarUrl string) error {
+func doRegister(openId,phoneNum,avatarUrl string,score int) error {
 	user := models.User{}
 	err := db.DB().Where("open_id=?",openId).First(&user).Error
 	if err!=nil && err!=gorm.ErrRecordNotFound{
@@ -66,6 +66,9 @@ func doRegister(openId,phoneNum,avatarUrl string) error {
 		user.UserId = y[len(y)-2:]+ time.Now().Month().String()+strconv.Itoa(time.Now().Hour())+strconv.Itoa(time.Now().Minute())+strconv.Itoa(time.Now().Second())+strconv.Itoa(int(rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000)))
 	}
 
+	if score != 0{
+		user.Score =score
+	}
 	if avatarUrl != ""{
 		user.AvatarUrl = avatarUrl
 	}
