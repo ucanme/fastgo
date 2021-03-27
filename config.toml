@@ -31,3 +31,7 @@ FileName = "fastgo"
 [UploadDir]
 Dir = "./files"
 Host = "http://127.0.0.1:19098/v1/assets/"
+
+[Wechat]
+ApiKey = ""
+ApiSecret = ""

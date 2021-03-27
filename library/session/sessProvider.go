@@ -1,7 +1,6 @@
 package session
 
 import (
-	uuid "github.com/satori/go.uuid"
 	"github.com/ucanme/fastgo/library/session/common"
 	"time"
 )
@@ -10,10 +9,10 @@ type sessProvider struct {
 	session *SessionInterface
 }
 
-func (s *sessProvider) SessionInit(sid string) (common.Session, error) {
+func (s *sessProvider) SessionInit(sid string,value string) (common.Session, error) {
 	sess := common.Session{
 		Sid:            sid,
-		Value:          uuid.NewV4().String(),
+		Value:          value,
 		LastAccessTime: time.Now().UnixNano()/1e6,
 	}
 	err := (*s.session).Set(sid,sess)

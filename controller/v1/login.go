@@ -1,20 +1,31 @@
 package v1
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"github.com/jinzhu/gorm"
+	"github.com/ucanme/fastgo/conf"
 	"github.com/ucanme/fastgo/consts"
 	"github.com/ucanme/fastgo/controller/response"
 	"github.com/ucanme/fastgo/internal/session"
-	"github.com/ucanme/fastgo/library/db"
-	"github.com/ucanme/fastgo/models"
+	"github.com/ucanme/fastgo/util"
 )
 import 	"github.com/gookit/validate"
 
 type loginReq struct {
-	UserId string `json:"user_id" validate:"required|minLen:7|maxLen:15"`
-	Password string `json:"password" validate:"required|minLen:7|maxLen:20"`
+	Code string
+}
+
+type loginResp struct {
+	OpenId string `json:"openid"`
+	SessionKey string `json:"session_key"`
+	ErrNo int `json:"errcode"`
+	
+}
+
+type SessionData struct {
+	OpenId string `json:"open_id"`
+	SessionKey string `json:"session_key"`
 }
 func Login(c *gin.Context)  {
 	input := loginReq{}
@@ -27,25 +38,21 @@ func Login(c *gin.Context)  {
 		response.Fail(c, consts.PARAM_ERR_CODE, consts.VALIDATE_ERR.Error())
 		return
 	}
-	uid := input.UserId
-	//password := input.PassWord
 
-	user := &models.User{}
-	err := db.DB().Where("user_id=?",uid).First(user).Error
-	if err == gorm.ErrRecordNotFound{
-		response.Fail(c, consts.USER_NOT_FOUND_CODE, consts.USER_NOT_FOUND_ERR.Error())
-		return
-	}
-
+	data,err := util.Get("https://api.weixin.qq.com/sns/jscode2session?appid="+conf.Config.Wechat.ApiKey+"&secret="+conf.Config.Wechat.ApiSecret+"&js_code=JSCODE&grant_type="+input.Code+"",nil)
 	if err!=nil{
-		response.Fail(c, consts.SYSMSTEM_ERR_CODE, consts.SYSMSTEM_ERR.Error())
-		return
+		response.Fail(c, 400, "登陆失败")
 	}
-
-	if user.Password != input.Password{
-		response.Fail(c, consts.USER_PASS_INCORRECT_CODE, consts.USER_PASS_INCORRECT_ERR.Error())
-		return
+ 	l:=loginResp{}
+	err = json.Unmarshal(data,&l)
+	if err!=nil || l.ErrNo !=0{
+		response.Fail(c, 400, "登陆失败")
 	}
-	session.Manager.SessionStart(c)
+	s := SessionData{
+		OpenId:    l.OpenId,
+		SessionKey: l.SessionKey,
+	}
+	d,_:=json.Marshal(s)
+	session.Manager.SessionStart(c,string(d))
 	response.Success(c,nil)
 }

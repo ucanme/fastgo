@@ -23,6 +23,10 @@ type ConfigTOML struct {
 		Dir string
 		Host string
 	}
+	Wechat struct{
+		ApiKey string `json:"api_key"`
+		ApiSecret string `json:"api_secret"`
+	}
 }
 
 var Config *ConfigTOML

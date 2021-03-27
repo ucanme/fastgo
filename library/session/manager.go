@@ -45,7 +45,7 @@ func (manager *Manager) sessionId() string {
 
 
 //根据当前请求的cookie中判断是否存在有效的session, 不存在则创建
-func (manager *Manager) SessionStart(c *gin.Context) (session common.Session) {
+func (manager *Manager) SessionStart(c *gin.Context,sessValue string) (session common.Session) {
 	//为该方法加锁
 	manager.lock.Lock()
 	defer manager.lock.Unlock()
@@ -60,7 +60,7 @@ func (manager *Manager) SessionStart(c *gin.Context) (session common.Session) {
 	fmt.Println("cookie",manager.cookieName,cookie,err)
 	if err != nil || cookie == "" {
 		sid := manager.sessionId()
-		session, _ = manager.provider.SessionInit(sid)
+		session, _ = manager.provider.SessionInit(sid,sessValue)
 		cookie := http.Cookie{
 			Name: manager.cookieName,
 			Value: url.QueryEscape(sid), //转义特殊符号@#￥%+*-等

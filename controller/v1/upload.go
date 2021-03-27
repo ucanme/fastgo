@@ -36,3 +36,4 @@ func DeviceUpload(c *gin.Context) {
 }
 
 
+

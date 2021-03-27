@@ -127,5 +127,7 @@ func V1(r gin.IRouter) {
 		g.POST("/article/list",v1.ListArticle)
 		g.POST("/file/upload",v1.DeviceUpload)
 		g.Static("/assets",conf.Config.UploadDir.Dir)
+		g.POST("v1/userinfo",v1.Register)
+		g.POST("/v1/login",v1.Login)
 	}
 }
