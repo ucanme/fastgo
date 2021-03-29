@@ -53,6 +53,11 @@ type addReq struct {
 	CateId int `json:"cate_id"`
 	Content string `json:"content"`
 	ImgUrl string `json:"img_url"`
+	Additional string `json:"additional"`
+	Additional01 string `json:"additional_01"`
+	Additional02 int `json:"additional_02"`
+	Additional03 int `json:"additional_03"`
+	Additional04 int `json:"additional_04"`
 }
 func AddArticle(c *gin.Context)  {
 	input := addReq{}
@@ -65,6 +70,10 @@ func AddArticle(c *gin.Context)  {
 		Content: input.Content,
 		CateId:  input.CateId,
 		ImgUrl: input.ImgUrl,
+		Additional: input.Additional,
+		Additional01: input.Additional01,
+		Additional02: input.Additional02,
+		Additional03: input.Additional03,
 	}
 	err := db.DB().Save(&a).Error
 	if err!=nil{

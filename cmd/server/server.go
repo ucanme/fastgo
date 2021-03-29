@@ -129,5 +129,6 @@ func V1(r gin.IRouter) {
 		g.POST("/userinfo",v1.Register)
 		g.POST("/login",v1.Login)
 		g.POST("/userlist",v1.UserList)
+		g.POST("/preorder",v1.PreOrder)
 	}
 }
