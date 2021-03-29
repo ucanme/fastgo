@@ -3,6 +3,7 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/jinzhu/gorm"
 	"github.com/ucanme/fastgo/consts"
 	"github.com/ucanme/fastgo/controller/response"
 	"github.com/ucanme/fastgo/library/db"
@@ -21,15 +22,25 @@ func PreOrder(c *gin.Context)  {
 			response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
 			return
 		}
-		preOrder := models.PreOrder{
-			Name:    input.Name,
-			Phone:   input.Phone,
-			Date:    input.Date,
-			PlaceId: input.Id,
+
+		preOrder := models.PreOrder{}
+		err := db.DB().Where("phone=? && date=? && place_id=?",input.Phone,input.Date,input.Id).Order("created_at desc").First(&preOrder).Error
+		if err!=nil && err!=gorm.ErrRecordNotFound{
+			response.Fail(c, 400, "预约失败")
+			return
 		}
-		err := db.DB().Create(&preOrder).Error
+
+		if err == gorm.ErrRecordNotFound{
+			preOrder.Phone = input.Phone
+			preOrder.Date = input.Date
+			preOrder.PlaceId = input.Id
+		}
+		preOrder.Name = input.Name
+		err = db.DB().Save(&preOrder).Error
 		if err !=nil{
 			response.Fail(c, 400, "预约失败")
 			return
 		}
+		response.Fail(c, 400, "预约失败")
+		return
 }
