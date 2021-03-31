@@ -35,7 +35,7 @@ func Login(c *gin.Context)  {
 	}
 
 	data,err := util.Get("https://api.weixin.qq.com/sns/jscode2session?appid="+conf.Config.Wechat.ApiKey+"&secret="+conf.Config.Wechat.ApiSecret+"&js_code=JSCODE&grant_type="+input.Code+"",nil)
-	fmt.Println(string(data))
+	fmt.Println("data",string(data))
 	if err!=nil{
 		fmt.Println(string(data))
 		response.Fail(c, 400, "登陆失败")
