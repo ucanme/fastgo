@@ -24,8 +24,8 @@ type ConfigTOML struct {
 		Host string
 	}
 	Wechat struct{
-		ApiKey string `json:"api_key"`
-		ApiSecret string `json:"api_secret"`
+		ApiKey string
+		ApiSecret string
 	}
 }
 
