@@ -34,7 +34,7 @@ func Login(c *gin.Context)  {
 		return
 	}
 
-	data,err := util.Get("https://api.weixin.qq.com/sns/jscode2session?appid="+conf.Config.Wechat.ApiKey+"&secret="+conf.Config.Wechat.ApiSecret+"&js_code=JSCODE&grant_type="+input.Code+"", map[string]string{"code":input.Code,"appid":conf.Config.Wechat.ApiKey,"secret":conf.Config.Wechat.ApiSecret})
+	data,err := util.Get("https://api.weixin.qq.com/sns/jscode2session", map[string]string{"js_code":input.Code,"grant_type":"authorization_code","appid":conf.Config.Wechat.ApiKey,"secret":conf.Config.Wechat.ApiSecret})
 	fmt.Println("data",string(data),"appid",conf.Config.Wechat.ApiKey)
 	if err!=nil{
 		fmt.Println(string(data))
