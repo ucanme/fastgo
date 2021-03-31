@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/ucanme/fastgo/conf"
@@ -10,10 +11,9 @@ import (
 	"github.com/ucanme/fastgo/internal/session"
 	"github.com/ucanme/fastgo/util"
 )
-import 	"github.com/gookit/validate"
 
 type loginReq struct {
-	Code string
+	Code string `json:"code" binding:"required"`
 }
 
 type loginResp struct {
@@ -33,20 +33,18 @@ func Login(c *gin.Context)  {
 		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
 		return
 	}
-	valid := validate.Struct(input)
-	if !valid.Validate(){
-		response.Fail(c, consts.PARAM_ERR_CODE, consts.VALIDATE_ERR.Error())
-		return
-	}
 
 	data,err := util.Get("https://api.weixin.qq.com/sns/jscode2session?appid="+conf.Config.Wechat.ApiKey+"&secret="+conf.Config.Wechat.ApiSecret+"&js_code=JSCODE&grant_type="+input.Code+"",nil)
 	if err!=nil{
+		fmt.Println(string(data))
 		response.Fail(c, 400, "登陆失败")
 	}
  	l:=loginResp{}
 	err = json.Unmarshal(data,&l)
 	if err!=nil || l.ErrNo !=0{
 		response.Fail(c, 400, "登陆失败")
+		return
+		fmt.Println(string(data))
 	}
 	s := SessionData{
 		OpenId:    l.OpenId,

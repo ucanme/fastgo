@@ -33,5 +33,5 @@ Dir = "./files"
 Host = "http://127.0.0.1:19098/v1/assets/"
 
 [Wechat]
-ApiKey = ""
-ApiSecret = ""
+ApiKey = "wx12580e7fcadd5e7d"
+ApiSecret = "676efdf15192f6524b6bc8e17fdee24b"

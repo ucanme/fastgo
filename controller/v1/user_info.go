@@ -89,3 +89,26 @@ func UserList(c *gin.Context)  {
 	}
 	response.Success(c,us)
 }
+
+
+
+type GetUserInfoReq struct {
+	OpenId string `json:"open_id" binding:"required"`
+}
+func GetUser(c *gin.Context)  {
+	input := GetUserInfoReq{}
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, 400, "参数错误")
+		return
+	}
+
+	openId := input.OpenId
+	u := models.User{}
+	err := db.DB().Where("open_id=?",openId).First(&u).Error
+	if err!=nil{
+		response.Fail(c, 400, "登陆失败")
+		return
+	}
+	response.Success(c,u)
+
+}
