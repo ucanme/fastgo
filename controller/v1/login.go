@@ -52,5 +52,5 @@ func Login(c *gin.Context)  {
 	}
 	d,_:=json.Marshal(s)
 	session.Manager.SessionStart(c,string(d))
-	response.Success(c,nil)
+	response.Success(c,s)
 }

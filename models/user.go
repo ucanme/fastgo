@@ -10,5 +10,10 @@ type User struct {
 	LastLoginTime int64 `json:"last_login_time" gorm:"type:varchar(64) not null"`
 	AvatarUrl string `json:"avatar_url" gorm:"type:varchar(128) not null"`
 	Status int8 `json:"status" gorm:"type:tinyint not null"`
-	Score int  `json:"avatar_url" gorm:"type:varchar(128) not null"`
+	Score int  `json:"score" gorm:"type:varchar(128) not null"`
+	Address  string `json:"address" gorm:"type:varchar(128) not null"`
+	Name string `json:"name" gorm:"type:varchar(128) not null"`
+	Length string `json:"length" gorm:"type:varchar(128) not null"`
+	Addition string `json:"addition" gorm:"type:varchar(128) not null"`
+	Addition01 string `json:"addition_01" gorm:"type:varchar(128) not null"`
 }

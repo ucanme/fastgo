@@ -19,6 +19,13 @@ type RegisterReq struct {
 	AvatarUrl string `json:"avatar_url"`
 	OpenId string `json:"open_id"`
 	Score int `json:"score"`
+	Name string `json:"name"`
+	Length string `json:"length"`
+	IdNo string `json:"id_no"`
+	Address string `json:"address"`
+	Addition string `json:"addition"`
+	Addition01 string `json:"addition01"`
+
 }
 
 func Register(c *gin.Context)  {
@@ -41,41 +48,64 @@ func Register(c *gin.Context)  {
 	//
 	//}
 
-	err :=doRegister(input.OpenId,input.PhoneNum,input.AvatarUrl,input.Score)
+	u,err :=doRegister(input)
 	if err!=nil{
 		response.Fail(c,400,"注册失败")
 		return
 	}
-	response.Success(c,[]string{})
+	response.Success(c,u)
 }
 
 //用户注册
-func doRegister(openId,phoneNum,avatarUrl string,score int) error {
+func doRegister(req RegisterReq) (models.User,error) {
 	user := models.User{}
-	err := db.DB().Where("open_id=?",openId).First(&user).Error
+	err := db.DB().Where("open_id=?",req.OpenId).First(&user).Error
 	if err!=nil && err!=gorm.ErrRecordNotFound{
-		return err
+		return user,err
 	}
 
-	user.OpenId = openId
-	if phoneNum != ""{
-		user.PhoneNum = phoneNum
+	user.OpenId = req.OpenId
+	if req.OpenId != ""{
+		user.PhoneNum = req.PhoneNum
 	}
 	if user.UserId == ""{
 		y  := strconv.Itoa(time.Now().Year())
 		user.UserId = y[len(y)-2:]+ time.Now().Month().String()+strconv.Itoa(time.Now().Hour())+strconv.Itoa(time.Now().Minute())+strconv.Itoa(time.Now().Second())+strconv.Itoa(int(rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000)))
 	}
 
-	if score != 0{
-		user.Score =score
+	if req.Score != 0{
+		user.Score =req.Score
 	}
-	if avatarUrl != ""{
-		user.AvatarUrl = avatarUrl
+	if req.Score == -1{
+		user.Score = 0
 	}
+	if req.AvatarUrl != ""{
+		user.AvatarUrl = req.AvatarUrl
+	}
+
+	if req.Address != ""{
+		user.Address = req.Address
+	}
+
+	if req.Length != ""{
+		user.Length = req.Length
+	}
+
+	if req.Name != ""{
+		user.Name = req.Name
+	}
+	if req.Addition != ""{
+		user.Addition = req.Addition
+	}
+
+	if req.Addition01 != ""{
+		user.Addition01 = req.Addition01
+	}
+
 	if err := db.DB().Save(&user).Error;err!=nil{
-		return err
+		return user,err
 	}
-	return nil;
+	return user,nil;
 }
 
 func UserList(c *gin.Context)  {
