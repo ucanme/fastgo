@@ -132,5 +132,8 @@ func V1(r gin.IRouter) {
 		g.POST("/login",v1.Login)
 		g.POST("/userlist",v1.UserList)
 		g.POST("/preorder",v1.PreOrder)
+		g.POST("/volunter/add",v1.VolunteerAdd)
+		g.POST("/volunter/delete",v1.VolunteerDelete)
+		g.POST("/volunter/list",v1.VolunteerList)
 	}
 }

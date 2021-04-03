@@ -41,5 +41,6 @@ func runInitDB(c *cli.Context) {
 	create.AutoMigrate(
 		&models.User{},
 		&models.Article{},
+		&models.Volunteer{},
 	)
 }
