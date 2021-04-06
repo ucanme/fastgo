@@ -17,12 +17,13 @@ func Demo(c *gin.Context) {
 
 
 type VolunterAddReq struct {
-	ArticleId string
-	Name string
-	Address string
-	PhoneNum string
-	OpenId string
-
+	ArticleId int `json:"article_id"`
+	Name string `json:"name"`
+	Address string `json:"address"`
+	PhoneNum string `json:"phone_num"`
+	OpenId string `json:"open_id"`
+	Length string `json:"length"`
+	IdNo string `json:"id_no"`
 }
 func VolunteerAdd(c *gin.Context)  {
 	input := VolunterAddReq{}
@@ -36,6 +37,8 @@ func VolunteerAdd(c *gin.Context)  {
 		PhoneNum:  input.PhoneNum,
 		ArticleId: input.ArticleId,
 		OpenId : input.OpenId,
+		Length : input.Length,
+		IdNo : input.IdNo,
 	}
 	err := db.DB().Save(&v).Error
 	if err!=nil{
@@ -71,8 +74,18 @@ func VolunteerDelete(c *gin.Context)  {
 
 
 func VolunteerList(c *gin.Context)  {
+	input := VolunterDeleteReq{}
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+	if input.Id <= 0{
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+
 	volunteers := []models.Volunteer{}
-	err := db.DB().Find(volunteers).Error
+	err := db.DB().Where("article_id = ?",input.Id).Find(&volunteers).Error
 	if err!=nil && err!=gorm.ErrRecordNotFound{
 		response.Fail(c, consts.DB_EXEC_ERR_CODE,"dberr")
 		return

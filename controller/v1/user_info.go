@@ -65,7 +65,7 @@ func doRegister(req RegisterReq) (models.User,error) {
 	}
 
 	user.OpenId = req.OpenId
-	if req.OpenId != ""{
+	if req.OpenId != "" && req.PhoneNum != ""{
 		user.PhoneNum = req.PhoneNum
 	}
 	if user.UserId == ""{

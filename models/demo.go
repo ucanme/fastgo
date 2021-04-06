@@ -10,8 +10,9 @@ type Demo struct {
 type PreOrder struct {
 	gorm.Model
 	Name string `json:"name"`
-	Phone string `json:"phone"`
+	PhoneNum string `json:"phone_num"`
 	Date string `json:"date"`
 	PlaceId int `json:"place_id"`
+	PersonCnt int `json:"person_cnt"`
 }
 

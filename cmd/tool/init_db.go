@@ -42,5 +42,6 @@ func runInitDB(c *cli.Context) {
 		&models.User{},
 		&models.Article{},
 		&models.Volunteer{},
+		&models.PreOrder{},
 	)
 }
