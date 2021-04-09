@@ -14,12 +14,12 @@ import (
 )
 
 type orderReq struct {
-	ArticleId  int `json:"article_id"`
-	Name string `json:"name"`
-	PhoneNum string `json:"phone_num"`
-	Date string `json:"date"`
-	PersonCnt int `json:"person_cnt"`
-	OpenId string `json:"open_id"`
+	ArticleId  int `json:"article_id" binding:"required"`
+	Name string `json:"name"  binding:"required"`
+	PhoneNum string `json:"phone_num"  binding:"required" `
+	Date string `json:"date"  binding:"required" `
+	PersonCnt int `json:"person_cnt"  binding:"required"`
+	OpenId string `json:"open_id"  binding:"required"`
 }
 func PreOrder(c *gin.Context)  {
 	input := orderReq{}
@@ -36,17 +36,17 @@ func PreOrder(c *gin.Context)  {
 	}
 
 	preOrder := models.PreOrder{}
-	err = db.DB().Where("article_id=? && date=? && open_id = ?",input.OpenId,input.Date,input.ArticleId).Order("created_at desc").First(&preOrder).Error
+	err = db.DB().Where("place_id=? && date=? && open_id = ?",input.ArticleId,input.Date,input.OpenId).Order("created_at desc").First(&preOrder).Error
 	if err != nil && err != gorm.ErrRecordNotFound{
 		response.Fail(c, 400, "系统错误")
 		return
 	}
 	if err == nil{
-		response.Fail(c, 400, "已经预约")
+		response.Fail(c, 400, "当日已经预约")
 		return
 	}
 	orders := []models.PreOrder{}
-	err = db.DB().Where("article_id=? && date=?").Find(&orders).Error
+	err = db.DB().Where("place_id=? && date=?",input.ArticleId,input.Date).Find(&orders).Error
 	if err != nil && err != gorm.ErrRecordNotFound{
 		response.Fail(c, 400, "系统错误")
 		return
@@ -69,6 +69,7 @@ func PreOrder(c *gin.Context)  {
 		Date:      input.Date,
 		PlaceId:   input.ArticleId,
 		PersonCnt: input.PersonCnt,
+		OpenId: input.OpenId,
 	}
 	err = db.DB().Save(&pre).Error
 	if err!=nil{
@@ -84,10 +85,13 @@ type PlaceOrderLeft struct {
 	LeftCnt int `json:"left_cnt"`
 }
 
+type PlaceOrderInfoReq struct {
+	ArticleId int `json:"article_id"`
+}
 func PlaceOrderInfo(c *gin.Context)  {
-	input := orderReq{}
+	input := PlaceOrderInfoReq{}
 	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
-		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error()+err.Error())
 		return
 	}
 

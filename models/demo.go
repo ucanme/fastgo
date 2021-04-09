@@ -14,5 +14,6 @@ type PreOrder struct {
 	Date string `json:"date"`
 	PlaceId int `json:"place_id"`
 	PersonCnt int `json:"person_cnt"`
+	OpenId string `json:"open_id"`
 }
 
