@@ -16,6 +16,10 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	swaggerFiles "github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
+
+	_ "github.com/swaggo/gin-swagger/example/basic/docs"
 )
 
 // Server ...
@@ -81,6 +85,7 @@ func run(c *cli.Context) {
 func GetEngine() *gin.Engine {
 	r := gin.Default()
 
+	swaggerInit(r)
 	var gRoute gin.IRouter
 
 	gRoute = r
@@ -137,4 +142,10 @@ func V1(r gin.IRouter) {
 		g.POST("/volunter/list",v1.VolunteerList)
 		g.POST("/place/order-left-info",v1.PlaceOrderInfo)
 	}
+}
+
+
+func swaggerInit(r gin.IRouter){
+	url := ginSwagger.URL("http://127.0.0.1:19098/swagger/doc.json") // The url pointing to API definition
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 }
