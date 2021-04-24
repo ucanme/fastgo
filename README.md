@@ -1,43 +1,182 @@
-### FastGO 框架
-#### 简介
-一个简单实用的go http框架, 支持命令行自定义cmd操作.基于gin web框架，gorm db操作，用起来比较顺手的轮子。
-#### 特性
-1. 支持access 与 panic recovery中间件,内含完整的日志记录。
-2. 基于logrus封装有log类库， 日志等级分级与自动切割，支持自定义日志保存和分割周期。
-3. 支持秒级cron定时任务配置，内含demo。
-4. 基于gorm，框架内含db初始化工具。
-5. 基于toml配置文件，含有完整解析类库
-6. 内含http请求工具类库。
-7. 使用go mod包管理工具，不依赖GOPATH的设置，需要go1.13以上版本
-8. 内含Dockerfile与Makefile支持一键编译docker镜像，内含docker-compose.yml示例支持一键容器运行
+## 接口文档
 
-#### 基本使用
+### 所有接口一律Post请求
+
+#### 1 登陆接口同之前项目
+
+#### 2 获取可预约的days
+
+Path: /v1/available-days/list
+
+Resp: 
+```
+{
+    "data":{
+        "days":["2021-10-10","2021-10-10"]
+    }
+}
 
 ```
-#基于命令行实用
- go run main.go server #web服务运行
- go run main.go init-db #db初始化
-#基于docker实用
- make docker #编译生成镜像
- docker-compose up #docker-compose运行,需提前替换docker-compose.yml中的镜像
+
+#### 3获取可预约的小时
+#### /v1/avaliable-hours/list
+Req:
 ```
-
-#### 如何获取
-github仓库地址: https://github.com/ucanme/fastgo.git
-欢迎批评指正，轮子会不断升级维护。使用交流QQ群: 15895722
-
-#### 优惠福利
-阿里云服务福利疫情最后几天活动 2核8g内存40G磁盘5m带宽三年1399，0.6折价格可做开发机，学习机，业务机，技术在于折腾。购买地址：https://www.aliyun.com/minisite/goods?userCode=b2d0no2s  
-
-
-#### 最近更新:
-新增Trace分支,支持requestId的track功能。
-
-通过修改源代码获取goroutine id,可以尝试直接修改源代码src/runtime/runtime2.go中添加Goid函数，将goid暴露给应用层：
-```
-func Goid() int64 {
-    _g_ := getg()
-    return _g_.goid
+{
+    "day" : "2021-10-01"
 }
 ```
+
+Resp
+```
+{
+    "data":{
+        "hours":["2021-10-10","2021-10-10"]
+    }
+}
+```
+
+#### 4获取可预约的小时
+#### /v1/avaliable-hours/list
+Req:
+```
+{
+    "day" : "2021-10-01",
+    "hour": 10 
+}
+```
+
+Resp
+```
+{
+    "data":{
+        "miniutes":["2021-10-10","2021-10-10"]
+    }
+}
+```
+
+
+
+#### 5进行预约
+#### /v1/make-appointment
+
+Req:
+```
+{
+    "day" : "2021-10-01",
+    "hour": 10,
+    "minute": 0,
+    "open_id":"",
+    "name" : "",
+    "phone_num":"",
+}
+```
+
+
+#### 6预约列表
+#### /v1/appointment/list
+Req:
+```bazaar
+{
+  "open_id" : "", 
+}
+```
+
+Resp 
+```bazaar
+{
+    "data":[
+            {
+            "datetime" : "2021-10-23 10:00:00",
+            "appointment_id" : 123
+        }
+      ]
+}  
+```
+
+#### 7取消预约
+#### /v1/cancel-appointment
+
+Req:
+```bazaar
+{
+  "open_id" : "", 
+  "appintment_id":123123
+}
+```
+
+
+
+#### 8签到
+v1./sign-in
+Req:
+```bazaar
+{
+  "appintment_id":123123
+}
+```
+
+
+
+#### 9管理系统预约列表
+#### /admin/appointment/list
+Req:
+```bazaar
+{
+  "date" : "2019-10-10", //非必填 不填返回最近一个月预约的所有
+}
+```
+
+Resp
+```bazaar
+[
+"data": [{
+    "day" : "2021-10-01",
+    "hour": 10,
+    "minute": 0,
+    "open_id":"",
+    "name" : "",
+    "phone_num":"",
+    "status" : 0 //0正常 1已经取消
+}]
+}
+```
+
+
+
+
+#### 9管理系统签到列表
+#### /admin/signin-appointment/list
+Req:
+```bazaar
+{
+  "date" : "2019-10-10", //非必填 不填返回最近一个月预约的所有
+}
+```
+
+Resp
+```bazaar
+[
+"data": [{
+    "day" : "2021-10-01",
+    "hour": 10,
+    "minute": 0,
+    "open_id":"",
+    "name" : "",
+    "phone_num":"",
+    "status" : 0 //0正常 1已经取消
+}]
+}
+```
+
+
+#### 10如果有新签到的通过websocket发送
+#### /ws/signin-notify
+{
+    "appointment_id":123,
+    "event_type" : "1"  //1签到 目前来看只有1
+}
+
+
+
 

@@ -125,22 +125,14 @@ func GetEngine() *gin.Engine {
 func V1(r gin.IRouter) {
 	g := r.Group("/v1")
 	{
-		g.POST("/article/add",v1.AddArticle)
-		g.POST("/article/delete",v1.DeleteArticle)
-		g.POST("/article/get",v1.GetArticle)
-		g.POST("/article/list",v1.ListArticle)
-		g.POST("/file/upload",v1.DeviceUpload)
-		g.Static("/assets",conf.Config.UploadDir.Dir)
-		g.POST("/userinfo",v1.Register)
-		g.POST("/userinfo/get",v1.GetUser)
-
 		g.POST("/login",v1.Login)
-		g.POST("/userlist",v1.UserList)
-		g.POST("/preorder",v1.PreOrder)
-		g.POST("/volunter/add",v1.VolunteerAdd)
-		g.POST("/volunter/delete",v1.VolunteerDelete)
-		g.POST("/volunter/list",v1.VolunteerList)
-		g.POST("/place/order-left-info",v1.PlaceOrderInfo)
+		g.POST("/available-days/list")
+		g.POST("/avaliable-hours/list")
+		g.POST("/avaliable-minitues/list")
+		g.POST("/make-appointment")
+		g.POST("/cancel-appointment")
+		g.POST("/appointment/list")
+		g.POST("/sign-in")
 	}
 }
 
