@@ -126,7 +126,7 @@ func V1(r gin.IRouter) {
 	g := r.Group("/v1")
 	{
 		g.POST("/login",v1.Login)
-		g.POST("/available-days/list")
+		g.POST("/available-days/list",v1.AvailableDaysList)
 		g.POST("/avaliable-hours/list")
 		g.POST("/avaliable-minitues/list")
 		g.POST("/make-appointment")

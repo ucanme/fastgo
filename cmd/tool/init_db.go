@@ -3,8 +3,8 @@ package tool
 import (
 	"github.com/ucanme/fastgo/conf"
 	"github.com/ucanme/fastgo/library/db"
-	"github.com/ucanme/fastgo/models"
 	"github.com/urfave/cli"
+	"github.com/ucanme/fastgo/models"
 )
 
 // InitDB ...
@@ -39,9 +39,6 @@ func runInitDB(c *cli.Context) {
 	//)
 
 	create.AutoMigrate(
-		&models.User{},
-		&models.Article{},
-		&models.Volunteer{},
-		&models.PreOrder{},
+		&models.Appointment{},
 	)
 }
