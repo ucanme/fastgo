@@ -127,7 +127,7 @@ func V1(r gin.IRouter) {
 	{
 		g.POST("/login",v1.Login)
 		g.POST("/available-days/list",v1.AvailableDaysList)
-		g.POST("/avaliable-hours/list")
+		g.POST("/avaliable-hours/list",v1.AvaliableHoursList)
 		g.POST("/avaliable-minitues/list")
 		g.POST("/make-appointment")
 		g.POST("/cancel-appointment")
