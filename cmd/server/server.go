@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ucanme/fastgo/cmd/server/middleware"
 	"github.com/ucanme/fastgo/conf"
+	"github.com/ucanme/fastgo/controller/admin"
 	v1 "github.com/ucanme/fastgo/controller/v1"
 	"github.com/ucanme/fastgo/cron"
 	"github.com/ucanme/fastgo/internal/session"
@@ -108,6 +109,7 @@ func GetEngine() *gin.Engine {
 	//gRoute.Use(static.Serve("/img", static.LocalFile(conf.Config.Server.ImagePath, false)))
 	fmt.Println("hello world")
 	V1(r)
+	Admin(r)
 	gRoute.GET("/health", func(c *gin.Context) {
 		c.String(200, "ok")
 	})
@@ -128,11 +130,19 @@ func V1(r gin.IRouter) {
 		g.POST("/login",v1.Login)
 		g.POST("/available-days/list",v1.AvailableDaysList)
 		g.POST("/avaliable-hours/list",v1.AvaliableHoursList)
-		g.POST("/avaliable-minitues/list")
-		g.POST("/make-appointment")
-		g.POST("/cancel-appointment")
-		g.POST("/appointment/list")
-		g.POST("/sign-in")
+		g.POST("/avaliable-minitues/list",v1.AvaliableMinutesList)
+		g.POST("/make-appointment",v1.MakeApointment)
+		g.POST("/cancel-appointment",v1.CancelAppointment)
+		g.POST("/appointment/list",v1.AppointmentList)
+		g.POST("/sign-in",v1.SignIn)
+	}
+}
+
+func Admin(r gin.IRouter)  {
+	g := r.Group("/admin")
+	{
+		g.POST("appointment/list",admin.AppointmentList)
+		g.POST("signin-appointment/list",admin.SigninAppointmentList)
 	}
 }
 
