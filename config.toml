@@ -14,7 +14,7 @@ e76cb1d7079fdaf49422fe711bfd98c6 = "e10adc3949ba59abbe56e057f20f883e"
 [Database]
 Enable = true
 UserPassword = "root:123456"
-DB = "we"
+DB = "appointment"
 [Database.Write]
 HostPort = "tcp(49.233.193.41:33061)"
 [Database.Read]

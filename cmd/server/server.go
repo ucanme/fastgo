@@ -48,6 +48,7 @@ func run(c *cli.Context) {
 	log.Init()
 
 	session.Init()
+	cron.Init()
 
 	srv := &http.Server{
 		Handler:      GetEngine(),
@@ -130,7 +131,7 @@ func V1(r gin.IRouter) {
 		g.POST("/login",v1.Login)
 		g.POST("/available-days/list",v1.AvailableDaysList)
 		g.POST("/avaliable-hours/list",v1.AvaliableHoursList)
-		g.POST("/avaliable-minitues/list",v1.AvaliableMinutesList)
+		g.POST("/avaliable-minutes/list",v1.AvaliableMinutesList)
 		g.POST("/make-appointment",v1.MakeApointment)
 		g.POST("/cancel-appointment",v1.CancelAppointment)
 		g.POST("/appointment/list",v1.AppointmentList)

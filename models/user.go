@@ -1,6 +1,9 @@
 package models
 
+import "github.com/jinzhu/gorm"
+
 type Appointment struct {
+	gorm.Model
 	Date string `json:"date"`
 	Hour int `json:"hour"`
 	Minute int `json:"minute"`

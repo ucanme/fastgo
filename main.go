@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ucanme/fastgo/cmd/server"
 	"github.com/ucanme/fastgo/cmd/tool"
+	"github.com/ucanme/fastgo/cron"
 	"github.com/urfave/cli"
 	"os"
 	"time"
@@ -27,6 +28,7 @@ func main() {
 	app.Commands = []cli.Command{
 		server.Server,
 		tool.InitDB,
+		cron.Util,
 	}
 	app.Before = func(c *cli.Context) error {
 		fmt.Printf("Hello fastgo, version %s\n", app.Version)

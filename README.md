@@ -11,11 +11,20 @@ Path: /v1/available-days/list
 Resp: 
 ```
 {
-    "data":{
-        "days":["2021-10-10","2021-10-10"]
-    }
+    "data": {
+        "days": [
+            "2021-05-01",
+            "2021-05-02",
+            "2021-05-03",
+            "2021-05-05",
+            "2021-05-08",
+            "2021-05-09"
+        ]
+    },
+    "error_msg": "success",
+    "error_no": 0,
+    "request_id": "fe338962-5fb3-423e-bba1-20f39db0a543"
 }
-
 ```
 
 #### 3获取可预约的小时
@@ -30,14 +39,36 @@ Req:
 Resp
 ```
 {
-    "data":{
-        "hours":["2021-10-10","2021-10-10"]
-    }
+    "data": [
+        {
+            "hour": 9,
+            "status": 0
+        },
+        {
+            "hour": 10,
+            "status": 0
+        },
+        {
+            "hour": 13,
+            "status": 0
+        },
+        {
+            "hour": 14,
+            "status": 0
+        },
+        {
+            "hour": 15,
+            "status": 0
+        }
+    ],
+    "error_msg": "success",
+    "error_no": 0,
+    "request_id": "152b4815-57d4-49e8-8630-401e128d9b79"
 }
 ```
 
 #### 4获取可预约的小时
-#### /v1/avaliable-hours/list
+#### /avaliable-minutes/list
 Req:
 ```
 {
@@ -49,9 +80,37 @@ Req:
 Resp
 ```
 {
-    "data":{
-        "miniutes":["2021-10-10","2021-10-10"]
-    }
+    "data": {
+        "minutes": [
+            {
+                "minute": 0,
+                "status": 0
+            },
+            {
+                "minute": 10,
+                "status": 0
+            },
+            {
+                "minute": 20,
+                "status": 0
+            },
+            {
+                "minute": 30,
+                "status": 0
+            },
+            {
+                "minute": 40,
+                "status": 0
+            },
+            {
+                "minute": 50,
+                "status": 0
+            }
+        ]
+    },
+    "error_msg": "success",
+    "error_no": 0,
+    "request_id": "0791d96d-fc24-4910-b29c-7fc483127c15"
 }
 ```
 
