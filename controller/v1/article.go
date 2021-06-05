@@ -105,4 +105,40 @@ func DeleteArticle(c *gin.Context)  {
 
 
 
+type EditReq struct {
+	Id int `json:"id" binding:"required"`
+	Content string `json:"content"`
+	ImgUrl string `json:"img_url"`
+}
+
+func EditArticle(c *gin.Context)  {
+	input := EditReq{}
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+	if input.Content == "" && input.ImgUrl == ""{
+		response.Fail(c, consts.PARAM_ERR_CODE,"修改字段不能同时为空")
+		return
+	}
+	if input.Content!=""{
+		err := db.DB().Where("id=?",input.Id).Update("content",input.Content).Error
+		if err!=nil{
+			response.Fail(c, consts.DB_EXEC_ERR_CODE,err.Error())
+			return
+		}
+	}
+	if input.ImgUrl != ""{
+		err := db.DB().Where("id=?",input.Id).Update("img_url",input.ImgUrl).Error
+		if err!=nil{
+			response.Fail(c, consts.DB_EXEC_ERR_CODE,err.Error())
+			return
+		}
+	}
+
+	response.Success(c,nil)
+}
+
+
+
 

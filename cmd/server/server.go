@@ -123,6 +123,8 @@ func V1(r gin.IRouter) {
 		g.POST("/article/add",v1.AddArticle)
 		g.POST("/article/delete",v1.DeleteArticle)
 		g.POST("/article/get",v1.GetArticle)
+		g.POST("/article/edit",v1.EditArticle)
+
 		g.POST("/article/list",v1.ListArticle)
 		g.POST("/file/upload",v1.DeviceUpload)
 		g.Static("/assets",conf.Config.UploadDir.Dir)
@@ -137,4 +139,5 @@ func V1(r gin.IRouter) {
 		g.POST("/volunter/list",v1.VolunteerList)
 		g.POST("/place/order-left-info",v1.PlaceOrderInfo)
 	}
+
 }
