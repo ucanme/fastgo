@@ -122,14 +122,14 @@ func EditArticle(c *gin.Context)  {
 		return
 	}
 	if input.Content!=""{
-		err := db.DB().Where("id=?",input.Id).Update("content",input.Content).Error
+		err := db.DB().Table("articles").Where("id=?",input.Id).Update("content",input.Content).Error
 		if err!=nil{
 			response.Fail(c, consts.DB_EXEC_ERR_CODE,err.Error())
 			return
 		}
 	}
 	if input.ImgUrl != ""{
-		err := db.DB().Where("id=?",input.Id).Update("img_url",input.ImgUrl).Error
+		err := db.DB().Table("articles").Where("id=?",input.Id).Update("img_url",input.ImgUrl).Error
 		if err!=nil{
 			response.Fail(c, consts.DB_EXEC_ERR_CODE,err.Error())
 			return
