@@ -131,3 +131,57 @@ func PlaceOrderInfo(c *gin.Context)  {
 
 	response.Success(c,ret)
 }
+
+
+
+func UserPlaceOrderList(c *gin.Context)  {
+	input := orderReq{}
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+
+
+	preOrders := []models.PreOrder{}
+
+	err := db.DB().Where("open_id = ? && date>= ?  && date <= ?",input.OpenId,time.Now().Format("2006-01-02"),time.Now().Add(time.Hour*720).Format("2006-01-02")).Find(&preOrders).Error
+	fmt.Println("err",err)
+	if err!=nil && err != gorm.ErrRecordNotFound{
+		fmt.Println(err)
+		response.Fail(c, 400, "系统错误")
+		return
+	}
+
+	articleId := []int{}
+	for _,v := range preOrders{
+		articleId = append(articleId,v.PlaceId)
+	}
+
+
+	articles := []models.Article{}
+	err = db.DB().Where("id in (?)",articleId).Find(&articles).Error
+	if err!=nil && err!= gorm.ErrRecordNotFound{
+		response.Fail(c, 400, "系统错误")
+		return
+	}
+	articleMap := map[uint]models.Article{}
+	for _,v := range articles{
+		articleMap[v.ID] = v
+	}
+
+	type OrderInfo struct {
+		PreOder models.PreOrder
+		Article models.Article
+	}
+	type Resp []OrderInfo
+	var resp = Resp{}
+	a := OrderInfo{}
+	for _,v := range preOrders{
+		a.PreOder = v
+		if _,ok:= articleMap[uint(v.PlaceId)];ok{
+			a.Article = articleMap[uint(v.PlaceId)]
+		}
+		resp = append(resp,a)
+	}
+	response.Success(c,resp)
+}
