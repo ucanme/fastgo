@@ -20,6 +20,8 @@ type orderReq struct {
 	Date string `json:"date"`
 	PersonCnt int `json:"person_cnt"`
 	OpenId string `json:"open_id"`
+	Addition string `json:"addition"`
+	Addition01 string `json:"addition_01"`
 }
 func PreOrder(c *gin.Context)  {
 	input := orderReq{}
@@ -69,6 +71,8 @@ func PreOrder(c *gin.Context)  {
 		Date:      input.Date,
 		PlaceId:   input.ArticleId,
 		PersonCnt: input.PersonCnt,
+		Addition: input.Addition,
+		Addtion01: input.Addition01,
 	}
 	err = db.DB().Save(&pre).Error
 	if err!=nil{
