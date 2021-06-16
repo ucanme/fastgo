@@ -24,7 +24,7 @@ VERSIONTAG			:= -ldflags "-X main.BuildTime=$(DATE_TIME) -X main.BuildGitHash=$(
 all: build
 
 build:
-	go build $(JSONITERTAG) -o bin/$(BIN_NAME) $(VERSIONTAG) .
+	go build  -mod=vendor  $(JSONITERTAG) -o bin/$(BIN_NAME) $(VERSIONTAG) .
 
 linux_build:
 	go build $(JSONITERTAG) -o bin/$(BIN_NAME) $(VERSIONTAG) .  `

@@ -217,13 +217,13 @@ func PlaceOrderList(c *gin.Context)  {
 	}
 
 	type OrderInfo struct {
-		PreOder []models.PreOrder
-		Article models.Article
+		PreOrders []models.PreOrder `json:"pre_orders"`
+		Article models.Article `json:"article"`
 	}
 	type Resp OrderInfo
 	var resp = Resp{}
 	for _,v := range preOrders{
-		resp.PreOder = append(resp.PreOder,v)
+		resp.PreOrders = append(resp.PreOrders,v)
 	}
 	resp.Article = article
 	response.Success(c,resp)
