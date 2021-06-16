@@ -12,4 +12,6 @@ type Article struct {
 	Additional01 string `json:"additional_01"`
 	Additional02 int `json:"additional_02"`
 	Additional03 int `json:"additional_03"`
+	Additional04 string `json:"additional_04"`
+
 }

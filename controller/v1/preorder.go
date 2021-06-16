@@ -185,3 +185,49 @@ func UserPlaceOrderList(c *gin.Context)  {
 	}
 	response.Success(c,resp)
 }
+
+
+func PlaceOrderList(c *gin.Context)  {
+	input := orderReq{}
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+	if input.ArticleId == 0{
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+	}
+
+
+	preOrders := []models.PreOrder{}
+
+	err := db.DB().Where("place_id = ? && date>= ?  && date <= ?",input.ArticleId,time.Now().Add(-time.Hour*720).Format("2006-01-02"),time.Now().Add(time.Hour*720).Format("2006-01-02")).Find(&preOrders).Error
+	fmt.Println("err",err)
+	if err!=nil && err != gorm.ErrRecordNotFound{
+		fmt.Println(err)
+		response.Fail(c, 400, "系统错误")
+		return
+	}
+
+
+	article := models.Article{}
+	err = db.DB().Where("id in (?)",input.ArticleId).First(&article).Error
+	if err!=nil{
+		response.Fail(c, 400, "不存在预约场所")
+		return
+	}
+
+	type OrderInfo struct {
+		PreOder []models.PreOrder
+		Article models.Article
+	}
+	type Resp OrderInfo
+	var resp = Resp{}
+	for _,v := range preOrders{
+		resp.PreOder = append(resp.PreOder,v)
+	}
+	resp.Article = article
+	response.Success(c,resp)
+
+
+}
+
