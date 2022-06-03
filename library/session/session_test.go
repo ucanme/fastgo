@@ -14,7 +14,7 @@ func TestNewProvider(t *testing.T) {
 	}
 	RegisterProvider("test",p)
 
-	s,err:= p.SessionInit("key123")
+	s,err:= p.SessionInit("key123","hello")
 	if err!=nil{
 		t.Logf("%s",err.Error())
 	}

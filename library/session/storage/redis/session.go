@@ -2,7 +2,6 @@ package redis
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/garyburd/redigo/redis"
 	uuid "github.com/satori/go.uuid"
 	"github.com/ucanme/fastgo/library/session/common"
@@ -18,10 +17,8 @@ func Init()  {
 
 func (s RedisStore)Set(key string, value common.Session) error  {
 	data,_ := json.Marshal(value)
-	fmt.Println("sesionset")
-	fmt.Println("aaa",connPool.Get())
-	fmt.Println("sesionset")
 	_,err :=connPool.Get().Do("set",key,string(data))
+	connPool.Get().Do("EXPIRE", key, 30)
 	return err
 }
 
@@ -37,7 +34,7 @@ func (s RedisStore) Get(key string) (common.Session,error) {
 
 
 func (s RedisStore) Delete(key string) error  {
-	_,err:= connPool.Get().Do("delete",key)
+	_,err:= connPool.Get().Do("del",key)
 	return err
 
 }

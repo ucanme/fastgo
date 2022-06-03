@@ -1,32 +1,48 @@
 package v1
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
-	"github.com/ucanme/fastgo/conf"
+	"github.com/jinzhu/gorm"
 	"github.com/ucanme/fastgo/consts"
 	"github.com/ucanme/fastgo/controller/response"
 	"github.com/ucanme/fastgo/internal/session"
-	"github.com/ucanme/fastgo/util"
+	"github.com/ucanme/fastgo/library/db"
+	"github.com/ucanme/fastgo/models"
+	"net/url"
 )
 
 type loginReq struct {
-	Code string `json:"code" binding:"required"`
+	UserID string `json:"user_id"`
+	Password string `json:"password"`
 }
 
 type loginResp struct {
-	OpenId string `json:"openid"`
-	SessionKey string `json:"session_key"`
+	UserID string `json:"user_id"`
+	//SessionKey string `json:"session_key"`
 	ErrNo int `json:"errcode"`
 	
 }
 
 type SessionData struct {
-	OpenId string `json:"open_id"`
+	UserID string `json:"user_id"`
 	SessionKey string `json:"session_key"`
 }
+
+func LoginOut(c *gin.Context)  {
+	cookie, _ := c.Cookie("login_session")
+	sid, _ := url.QueryUnescape(cookie)
+	if sid == ""{
+		response.Fail(c,400,"请登陆")
+		return
+	}
+	session.Manager.SessionDestroy(c)
+}
+
+
 func Login(c *gin.Context)  {
 	input := loginReq{}
 	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
@@ -34,23 +50,36 @@ func Login(c *gin.Context)  {
 		return
 	}
 
-	data,err := util.Get("https://api.weixin.qq.com/sns/jscode2session", map[string]string{"js_code":input.Code,"grant_type":"authorization_code","appid":conf.Config.Wechat.ApiKey,"secret":conf.Config.Wechat.ApiSecret})
-	fmt.Println("data",string(data),"appid",conf.Config.Wechat.ApiKey)
-	if err!=nil{
-		fmt.Println(string(data))
-		response.Fail(c, 400, "登陆失败")
+	account := models.Account{}
+	err := db.DB().Where("account_id = ?",input.UserID).First(&account).Error
+
+	if account.AccountId == "" || err == gorm.ErrRecordNotFound{
+		response.Fail(c, 400, "登陆失败 用户不存存在")
+		return
 	}
- 	l:=loginResp{}
-	err = json.Unmarshal(data,&l)
-	if err!=nil || l.ErrNo !=0{
-		response.Fail(c, 400, "登陆失败")
+
+	if err!=nil{
+		response.Fail(c, 400, "登陆失败 系统错误")
+		return
+	}
+
+
+	passStr := Md5(input.Password)
+	if passStr != account.Password{
+		response.Fail(c, 400, "登陆失败 密码错误")
 		return
 	}
 	s := SessionData{
-		OpenId:    l.OpenId,
-		SessionKey: l.SessionKey,
+		UserID:    account.AccountId,
+		//SessionKey: .SessionKey,
 	}
 	d,_:=json.Marshal(s)
 	session.Manager.SessionStart(c,string(d))
-	response.Success(c,s)
+	response.Success(c,nil)
+}
+
+func Md5(s string) string {
+	h := md5.New()
+	h.Write([]byte(s))
+	return hex.EncodeToString(h.Sum(nil))
 }

@@ -2,13 +2,12 @@ package models
 
 import "github.com/jinzhu/gorm"
 
-type Appointment struct {
+type Account struct {
+	AccountId string `json:"account_id" gorm:"column:account_id"`
+	Password string `json:"password" gorm:"column:password"`
 	gorm.Model
-	Date string `json:"date"`
-	Hour int `json:"hour"`
-	Minute int `json:"minute"`
-	Status int `json:"status"` //0表示未预约 1表示已经预约 2 已经签到
-	Name string `json:"name"`
-	OpenId string `json:"open_id"`
-	PhoneNum string `json:"phone_num"`
+}
+
+func (Account)TableName()string  {
+	return "account"
 }

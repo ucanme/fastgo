@@ -2,9 +2,12 @@ package middleware
 
 import (
 	"bytes"
+	"github.com/ucanme/fastgo/controller/response"
+	"github.com/ucanme/fastgo/internal/session"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +15,11 @@ import (
 	"encoding/json"
 	clog "github.com/ucanme/fastgo/library/log"
 )
+
+
+var skipUrls = map[string]int{
+	"/v1/login" :1,
+}
 
 type bodyLogWriter struct {
 	gin.ResponseWriter
@@ -23,8 +31,28 @@ func (w bodyLogWriter) Write(b []byte) (int, error) {
 	return w.ResponseWriter.Write(b)
 }
 
+func LoginAuth(c *gin.Context)  {
+	if skipUrls[c.Request.RequestURI] == 0 {
+		cookie, err := c.Cookie("login_session")
+		sid, _ := url.QueryUnescape(cookie)
+		if sid == "" {
+			response.Fail(c, 400, "请登陆")
+			c.Abort()
+			return
+		}
+		_, err= session.Manager.Read(sid)
+		if err != nil {
+			err = session.Manager.SessionDestroy(c)
+			response.Fail(c, 400, "请登陆")
+			c.Abort()
+			return
+		}
+	}
+}
+
 func Access() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		LoginAuth(c)
 		blw := &bodyLogWriter{body: &bytes.Buffer{}, ResponseWriter: c.Writer}
 		c.Writer = blw
 		start := time.Now()

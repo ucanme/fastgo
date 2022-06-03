@@ -20,6 +20,8 @@ const (
 	HeaderKeyTimestamp = "timestamp"
 )
 
+
+
 func Auth() gin.HandlerFunc {
 	secret := conf.Config.Auth.Secret
 	accounts := conf.Config.Auth.Accounts

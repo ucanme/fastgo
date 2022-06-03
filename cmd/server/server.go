@@ -3,9 +3,11 @@ package server
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
 	"github.com/ucanme/fastgo/cmd/server/middleware"
 	"github.com/ucanme/fastgo/conf"
-	"github.com/ucanme/fastgo/controller/admin"
+	"github.com/ucanme/fastgo/controller/response"
 	v1 "github.com/ucanme/fastgo/controller/v1"
 	"github.com/ucanme/fastgo/cron"
 	"github.com/ucanme/fastgo/internal/session"
@@ -17,8 +19,6 @@ import (
 	"os"
 	"os/signal"
 	"time"
-	swaggerFiles "github.com/swaggo/files"
-	"github.com/swaggo/gin-swagger"
 
 	_ "github.com/swaggo/gin-swagger/example/basic/docs"
 )
@@ -108,7 +108,6 @@ func GetEngine() *gin.Engine {
 	})
 	//gRoute.Use(middleware.Recovery(), prometheus.PrometheusHttpHook)
 	//gRoute.Use(static.Serve("/img", static.LocalFile(conf.Config.Server.ImagePath, false)))
-	fmt.Println("hello world")
 	V1(r)
 	Admin(r)
 	gRoute.GET("/health", func(c *gin.Context) {
@@ -129,21 +128,18 @@ func V1(r gin.IRouter) {
 	g := r.Group("/v1")
 	{
 		g.POST("/login",v1.Login)
-		g.POST("/available-days/list",v1.AvailableDaysList)
-		g.POST("/avaliable-hours/list",v1.AvaliableHoursList)
-		g.POST("/avaliable-minutes/list",v1.AvaliableMinutesList)
-		g.POST("/make-appointment",v1.MakeApointment)
-		g.POST("/cancel-appointment",v1.CancelAppointment)
-		g.POST("/appointment/list",v1.AppointmentList)
-		g.POST("/sign-in",v1.SignIn)
+		g.POST("/logout",v1.LoginOut)
+		g.POST("/status",Status)
 	}
 }
 
+func Status(c *gin.Context)  {
+	response.Success(c,map[string]string{"hello":"world"})
+}
+
 func Admin(r gin.IRouter)  {
-	g := r.Group("/admin")
+	//g := r.Group("/admin")
 	{
-		g.POST("appointment/list",admin.AppointmentList)
-		g.POST("signin-appointment/list",admin.SigninAppointmentList)
 	}
 }
 

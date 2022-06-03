@@ -1,12 +1,5 @@
 package conf
 
-type FloorConfig struct {
-	Floor       string `required:"true"`
-	NodePrefix  string `required:"true"`
-	MapFileName string `required:"true"`
-	MapScale    float32
-	ModelID     string
-}
 
 type DatabaseConfig struct {
 	Enable       bool
@@ -24,6 +17,8 @@ type DatabaseConfig struct {
 		MaxOpen     int `required:"true"`
 	}
 }
+
+
 
 type ServerConfig struct {
 	Listen    string `required:"true"`

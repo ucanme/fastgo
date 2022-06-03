@@ -50,23 +50,16 @@ func (manager *Manager) SessionStart(c *gin.Context,sessValue string) (session c
 	manager.lock.Lock()
 	defer manager.lock.Unlock()
 	//获取 request 请求中的 cookie 值
-	fmt.Println(manager.cookieName)
 	cookie, err := c.Cookie("login_session")
-	cookie1 := c.Request.Cookies()
-	fmt.Println("cookie1",cookie1,err)
-	if err== nil{
-		fmt.Println(cookie1)
-	}
-	fmt.Println("cookie",manager.cookieName,cookie,err)
 	if err != nil || cookie == "" {
 		sid := manager.sessionId()
-		session, _ = manager.provider.SessionInit(sid,sessValue)
+		session, err = manager.provider.SessionInit(sid,sessValue)
 		cookie := http.Cookie{
 			Name: manager.cookieName,
 			Value: url.QueryEscape(sid), //转义特殊符号@#￥%+*-等
 			Path: "/",
 			HttpOnly: true,
-			Domain: "http://localhost:18089",
+			Domain: "http://127.0.0.1:18089",
 			MaxAge: int(manager.maxLifeTime),
 			Secure: false,
 		}
@@ -74,25 +67,27 @@ func (manager *Manager) SessionStart(c *gin.Context,sessValue string) (session c
 		//context.SetCookie("name", "Shimin Li", 10, "/", "localhost", false, true)
 		//c.SetCookie(cookie.Name,cookie.Value,cookie.MaxAge,cookie.Path,"",false,true)
 		c.SetCookie(cookie.Name,cookie.Value,cookie.MaxAge,cookie.Path,"127.0.0.1",false,true)
+		session, err = manager.provider.SessionRead(sid)
+
 	} else {
 		sid, _ := url.QueryUnescape(cookie)
 		fmt.Println(cookie,sid)
-		session, _ = manager.provider.SessionRead(sid)
+		session, err = manager.provider.SessionRead(sid)
 	}
 	return
 }
 
 // SessionDestroy 注销 Session
-func (manager *Manager) SessionDestroy(c *gin.Context) {
+func (manager *Manager) SessionDestroy(c *gin.Context)error {
 	cookie, err := c.Cookie(manager.cookieName)
 	if err != nil || cookie == "" {
-		return
+		return err
 	}
 
 	manager.lock.Lock()
 	defer manager.lock.Unlock()
 
-	manager.provider.SessionDestroy(cookie)
+	err = manager.provider.SessionDestroy(cookie)
 	expiredTime := time.Now()
 	newCookie := http.Cookie{
 		Name: manager.cookieName,
@@ -101,6 +96,7 @@ func (manager *Manager) SessionDestroy(c *gin.Context) {
 		MaxAge: -1,  //会话级cookie
 	}
 	c.SetCookie(newCookie.Name,newCookie.Value,newCookie.MaxAge,newCookie.Path,"",true,true)
+	return err
 }
 
 
@@ -112,4 +108,8 @@ func (manager *Manager) SessionGC() {
 	time.AfterFunc(time.Duration(manager.maxLifeTime), func() {
 		manager.SessionGC()
 	})
+}
+
+func (manager *Manager) Read(sid string) (common.Session,error) {
+	return manager.provider.SessionRead(sid)
 }

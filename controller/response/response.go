@@ -1,7 +1,6 @@
 package response
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	log "github.com/ucanme/fastgo/library/log"
 )
@@ -24,6 +23,5 @@ func Success(c *gin.Context, data interface{}) {
 		data = map[string]string{}
 	}
 	msg := "success"
-	fmt.Println("Data", data)
 	Response(c, 0, msg, data)
 }
