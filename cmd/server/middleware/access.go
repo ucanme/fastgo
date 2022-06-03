@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"bytes"
+	"github.com/ucanme/fastgo/consts"
 	"github.com/ucanme/fastgo/controller/response"
 	"github.com/ucanme/fastgo/internal/session"
 	"io/ioutil"
@@ -36,14 +37,14 @@ func LoginAuth(c *gin.Context)  {
 		cookie, err := c.Cookie("login_session")
 		sid, _ := url.QueryUnescape(cookie)
 		if sid == "" {
-			response.Fail(c, 400, "请登陆")
+			response.Fail(c, consts.ACCOUTN_NOT_LOGIN, "请登陆")
 			c.Abort()
 			return
 		}
 		_, err= session.Manager.Read(sid)
 		if err != nil {
 			err = session.Manager.SessionDestroy(c)
-			response.Fail(c, 400, "请登陆")
+			response.Fail(c, consts.ACCOUTN_NOT_LOGIN, "请登陆")
 			c.Abort()
 			return
 		}

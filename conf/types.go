@@ -37,3 +37,9 @@ type KafkaCfg struct {
 	AuthType string
 	CertDir  string
 }
+
+
+type Redis struct {
+	Host string
+	Password string
+}

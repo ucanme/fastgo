@@ -32,6 +32,6 @@ FileName = "fastgo"
 Dir = "./files"
 Host = "http://127.0.0.1:19098/v1/assets/"
 
-[Wechat]
-ApiKey = "wx12580e7fcadd5e7d"
-ApiSecret = "676efdf15192f6524b6bc8e17fdee24b"
+[Redis]
+Host = "127.0.0.1:6379"
+Password = "12345678"

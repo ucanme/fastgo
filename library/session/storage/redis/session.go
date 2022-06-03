@@ -18,7 +18,7 @@ func Init()  {
 func (s RedisStore)Set(key string, value common.Session) error  {
 	data,_ := json.Marshal(value)
 	_,err :=connPool.Get().Do("set",key,string(data))
-	connPool.Get().Do("EXPIRE", key, 30)
+	connPool.Get().Do("EXPIRE", key, 3600*24)
 	return err
 }
 

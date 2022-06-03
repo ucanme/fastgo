@@ -15,6 +15,8 @@ type ConfigTOML struct {
 		Skips    []string
 	}
 
+	Redis Redis
+
 	Log struct {
 		FilePath string
 		FileName string

@@ -24,10 +24,10 @@ VERSIONTAG			:= -ldflags "-X main.BuildTime=$(DATE_TIME) -X main.BuildGitHash=$(
 all: build
 
 build:
-	go build $(JSONITERTAG) -o bin/$(BIN_NAME) $(VERSIONTAG) .
+	go build $(JSONITERTAG) --tags netgo -o bin/$(BIN_NAME)  $(VERSIONTAG) .
 
 linux_build:
-	go build $(JSONITERTAG) -o bin/$(BIN_NAME) $(VERSIONTAG) .  `
+	go build $(JSONITERTAG) -o bin/$(BIN_NAME) $(VERSIONTAG) .
 # 	$(COMMONENVVAR) $(BUILDENVVAR) go build $(JSONITERTAG) -o bin/$(BIN_NAME)-linux $(VERSIONTAG) .
 
 test:
@@ -35,7 +35,7 @@ test:
 
 
 docker:
-	docker build -t $(DOCKER_HUB)/$(DOCKER_GROUP)/$(DOCKER_PROJECT):$(DOCKER_VERSION) -f Dockerfile .
+	docker build -t $(DOCKER_HUB)/$(DOCKER_GROUP)/$(DOCKER_PROJECT):$(DOCKER_VERSION)  -f Dockerfile .
 
 docker-push:
 	docker push $(DOCKER_HUB)/$(DOCKER_GROUP)/$(DOCKER_PROJECT):$(DOCKER_VERSION)

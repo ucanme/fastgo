@@ -36,7 +36,7 @@ func LoginOut(c *gin.Context)  {
 	cookie, _ := c.Cookie("login_session")
 	sid, _ := url.QueryUnescape(cookie)
 	if sid == ""{
-		response.Fail(c,400,"请登陆")
+		response.Fail(c,consts.ACCOUTN_NOT_LOGIN,"请登陆")
 		return
 	}
 	session.Manager.SessionDestroy(c)

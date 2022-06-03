@@ -7,7 +7,7 @@ RUN go env -w GOPROXY=https://goproxy.io,direct
 
 RUN make
 
-FROM golang:1.13
+FROM alpine
 WORKDIR /root
 COPY --from=builder /root/bin/fastgo /root/fastgo
 RUN ln -s /root/fastgo /bin/fastgo
