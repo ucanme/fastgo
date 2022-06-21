@@ -40,6 +40,8 @@ func LoginOut(c *gin.Context)  {
 		return
 	}
 	session.Manager.SessionDestroy(c)
+	response.Success(c,map[string]interface{}{})
+	return
 }
 
 

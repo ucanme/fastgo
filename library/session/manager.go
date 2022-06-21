@@ -59,7 +59,7 @@ func (manager *Manager) SessionStart(c *gin.Context,sessValue string) (session c
 			Value: url.QueryEscape(sid), //转义特殊符号@#￥%+*-等
 			Path: "/",
 			HttpOnly: true,
-			Domain: "http://127.0.0.1:18089",
+			//Domain: "http://127.0.0.1:18089",
 			MaxAge: int(manager.maxLifeTime),
 			Secure: false,
 		}
