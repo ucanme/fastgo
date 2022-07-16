@@ -20,6 +20,7 @@ import (
 
 var skipUrls = map[string]int{
 	"/v1/login" :1,
+	"/v1/report":1,
 }
 
 type bodyLogWriter struct {
