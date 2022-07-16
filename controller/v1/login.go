@@ -170,9 +170,8 @@ func Report(c *gin.Context)  {
 		return
 	}
 
-	moveUnitList := []models.MoveUnit{}
 	for _,moveUnitParam := range moveUnitParamList{
-		moveUnit := models.MoveUnit{
+		moveUnit := &models.MoveUnit{
 			MoveUnitSn:         moveUnitParam.MoveUnitSn,
 			Soc:                moveUnitParam.Soc,
 			Status:             moveUnitParam.Status,
@@ -184,12 +183,18 @@ func Report(c *gin.Context)  {
 			WorkDuration:       moveUnitParam.WorkDuration,
 			ProductionLineId:   moveUnitParam.ProductionLineId,
 		}
-		moveUnitList = append(moveUnitList,moveUnit)
-		err = db.DB().Updates(moveUnitList).Error
-		if err != nil{
+		ret := db.DB().Table("move_unit").Debug().Where("move_unit_sn = ?",moveUnitParam.MoveUnitSn).Update(moveUnit)
+		fmt.Println("err----",err)
+		if ret.Error!= nil{
 			response.Fail(c, consts.DB_EXEC_ERR_CODE, consts.DB_EXEC_ERR.Error())
 			return
 		}
+		if ret.RowsAffected == 0{
+			response.Fail(c, consts.DB_ROWS_AFFECTED_ZERO_CODE, consts.DB_ROWS_AFFECTED_ZERO_ERR.Error())
+			return
+		}
+		db.DB().AutoMigrate(&models.MoveUnit{})
+		db.DB().AutoMigrate(&models.ProductionLine{})
 	}
 	response.Success(c,nil)
 }
