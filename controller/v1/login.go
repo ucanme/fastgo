@@ -138,14 +138,58 @@ type ReportReq struct {
 	Payload string `json:"payload"`
 }
 
+
+type MoveUnit []struct {
+	MoveUnitSn string `json:"move_unit_sn"`
+	CurrentStationCode string `json:"current_station_code"`
+	IsInStation int `json:"is_in_station"`
+	Status int `json:"status"`
+	Soc int `json:"soc"`
+	Speed float64 `json:"speed"`
+	RingAngle float32 `json:"ring_angle"`
+	RingStatus int `json:"ring_status"`
+	WorkDuration int `json:"work_duration"`
+	ProductionLineId int `json:"production_line_id" gorm:"column:production_line_id"`
+}
+
 func Report(c *gin.Context)  {
 	input := ReportReq{}
 	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
 		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
 		return
 	}
-
-	switch input.EventType {
-
+	moveUnitParamList := MoveUnit{}
+	err := json.Unmarshal([]byte(input.Payload),&moveUnitParamList)
+	if err != nil{
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
 	}
+
+	if len(moveUnitParamList) == 0{
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+
+	moveUnitList := []models.MoveUnit{}
+	for _,moveUnitParam := range moveUnitParamList{
+		moveUnit := models.MoveUnit{
+			MoveUnitSn:         moveUnitParam.MoveUnitSn,
+			Soc:                moveUnitParam.Soc,
+			Status:             moveUnitParam.Status,
+			Speed:              moveUnitParam.Speed,
+			CurrentStationCode: moveUnitParam.CurrentStationCode,
+			IsInStation:        moveUnitParam.IsInStation,
+			RingAngle:          moveUnitParam.RingAngle,
+			RingStatus:         moveUnitParam.RingStatus,
+			WorkDuration:       moveUnitParam.WorkDuration,
+			ProductionLineId:   moveUnitParam.ProductionLineId,
+		}
+		moveUnitList = append(moveUnitList,moveUnit)
+		err = db.DB().Updates(moveUnitList).Error
+		if err != nil{
+			response.Fail(c, consts.DB_EXEC_ERR_CODE, consts.DB_EXEC_ERR.Error())
+			return
+		}
+	}
+	response.Success(c,nil)
 }

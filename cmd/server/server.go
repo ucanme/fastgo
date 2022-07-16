@@ -132,6 +132,7 @@ func V1(r gin.IRouter) {
 		g.POST("/logout",v1.LoginOut)
 		g.POST("/status",Status)
 		g.POST("/cmd",v1.Cmd)
+		g.POST("/report",v1.Report)
 	}
 }
 
