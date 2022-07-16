@@ -38,4 +38,4 @@ Password = "12345678"
 
 
 [PlatformApi]
-Host = "http://49.233.182.33:8080/cmd"
+Host = "http://49.233.182.33:8089"

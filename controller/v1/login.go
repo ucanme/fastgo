@@ -101,7 +101,7 @@ type CmdReq struct {
 }
 
 type CmdResp struct {
-	ErrorCode int `json:"error_code"`
+	ErrorCode int `json:"error_no"`
 	ErrorMsg string `json:"error_msg"`
 }
 func Cmd(c *gin.Context)  {
@@ -114,14 +114,13 @@ func Cmd(c *gin.Context)  {
 	data,_ := json.Marshal(input)
 
 	resp,err := util.Post(conf.Config.PlatformApi.Host+"/v1/cmd",data, map[string]string{}, map[string]string{})
-	fmt.Println("err----",err)
 	if err != nil{
 		response.Fail(c, consts.REQUEST_FAIL_CODE, consts.REQUEST_FAIL.Error())
 		return
 	}
 	apiResp := CmdResp{}
 	err = json.Unmarshal(resp,&apiResp)
-	if err == nil{
+	if err != nil{
 		response.Fail(c, consts.REQUEST_FAIL_CODE, consts.REQUEST_FAIL.Error())
 		return
 	}
@@ -149,7 +148,8 @@ type MoveUnit []struct {
 	RingAngle float32 `json:"ring_angle"`
 	RingStatus int `json:"ring_status"`
 	WorkDuration int `json:"work_duration"`
-	ProductionLineId int `json:"production_line_id" gorm:"column:production_line_id"`
+	ProductionLineId int `json:"production_line_id"`
+	Timestamp int64 `json:"timestamp"`
 }
 
 func Report(c *gin.Context)  {
@@ -182,6 +182,7 @@ func Report(c *gin.Context)  {
 			RingStatus:         moveUnitParam.RingStatus,
 			WorkDuration:       moveUnitParam.WorkDuration,
 			ProductionLineId:   moveUnitParam.ProductionLineId,
+			Timestamp : moveUnitParam.Timestamp,
 		}
 		ret := db.DB().Table("move_unit").Debug().Where("move_unit_sn = ?",moveUnitParam.MoveUnitSn).Update(moveUnit)
 		fmt.Println("err----",err)

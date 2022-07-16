@@ -12,6 +12,7 @@ type MoveUnit struct {
 	RingStatus int `json:"ring_status" gorm:"column:ring_status"`
 	WorkDuration int `json:"work_duration" gorm:"column:work_duration"`
 	ProductionLineId int `json:"production_line_id" gorm:"column:production_line_id"`
+	Timestamp int64 `json:"timestamp" gorm:"timestamp"`
 	gorm.Model
 }
 
