@@ -43,3 +43,7 @@ type Redis struct {
 	Host string
 	Password string
 }
+
+type PlatformApiConfig struct {
+	Host string `json:"host"`
+}

@@ -4,14 +4,18 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/jinzhu/gorm"
+	"github.com/ucanme/fastgo/conf"
 	"github.com/ucanme/fastgo/consts"
 	"github.com/ucanme/fastgo/controller/response"
 	"github.com/ucanme/fastgo/internal/session"
 	"github.com/ucanme/fastgo/library/db"
+	"github.com/ucanme/fastgo/library/log"
 	"github.com/ucanme/fastgo/models"
+	"github.com/ucanme/fastgo/util"
 	"net/url"
 )
 
@@ -33,13 +37,17 @@ type SessionData struct {
 }
 
 func LoginOut(c *gin.Context)  {
-	cookie, _ := c.Cookie("login_session")
-	sid, _ := url.QueryUnescape(cookie)
+	cookie, err := c.Cookie("login_session")
+	log.LogNotice(map[string]interface{}{"cookie":cookie,"err":err})
+	sid, err := url.QueryUnescape(cookie)
+	log.LogNotice(map[string]interface{}{"sid":sid,"err":err})
 	if sid == ""{
+		log.LogNotice(map[string]interface{}{"sid":sid,"err":err})
 		response.Fail(c,consts.ACCOUTN_NOT_LOGIN,"请登陆")
 		return
 	}
-	session.Manager.SessionDestroy(c)
+	err = session.Manager.SessionDestroy(c)
+	log.LogNotice(map[string]interface{}{"delete session err":err})
 	response.Success(c,map[string]interface{}{})
 	return
 }
@@ -84,4 +92,60 @@ func Md5(s string) string {
 	h := md5.New()
 	h.Write([]byte(s))
 	return hex.EncodeToString(h.Sum(nil))
+}
+
+
+type CmdReq struct {
+	CmdType string `json:"cmd_type"`
+	Payload string `json:"payload"`
+}
+
+type CmdResp struct {
+	ErrorCode int `json:"error_code"`
+	ErrorMsg string `json:"error_msg"`
+}
+func Cmd(c *gin.Context)  {
+	input := CmdReq{}
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+
+	data,_ := json.Marshal(input)
+
+	resp,err := util.Post(conf.Config.PlatformApi.Host+"/v1/cmd",data, map[string]string{}, map[string]string{})
+	fmt.Println("err----",err)
+	if err != nil{
+		response.Fail(c, consts.REQUEST_FAIL_CODE, consts.REQUEST_FAIL.Error())
+		return
+	}
+	apiResp := CmdResp{}
+	err = json.Unmarshal(resp,&apiResp)
+	if err == nil{
+		response.Fail(c, consts.REQUEST_FAIL_CODE, consts.REQUEST_FAIL.Error())
+		return
+	}
+	if apiResp.ErrorCode != 0 {
+		response.Fail(c, consts.REQUEST_FAIL_CODE, apiResp.ErrorMsg)
+		return
+	}
+	response.Success(c,nil)
+}
+
+
+type ReportReq struct {
+	EventType string `json:"event_type"`
+	Payload string `json:"payload"`
+}
+
+func Report(c *gin.Context)  {
+	input := ReportReq{}
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+
+	switch input.EventType {
+
+	}
 }

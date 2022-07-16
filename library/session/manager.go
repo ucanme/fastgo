@@ -5,10 +5,12 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/ucanme/fastgo/library/log"
 	"github.com/ucanme/fastgo/library/session/common"
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"sync"
 	"time"
 )
@@ -51,35 +53,52 @@ func (manager *Manager) SessionStart(c *gin.Context,sessValue string) (session c
 	defer manager.lock.Unlock()
 	//获取 request 请求中的 cookie 值
 	cookie, err := c.Cookie("login_session")
-	if err != nil || cookie == "" {
-		sid := manager.sessionId()
+	domain := c.Request.Host
+	if strings.Contains(c.Request.Host,":"){
+		domain = strings.Split(c.Request.Host,":")[0]
+	}
+
+	fmt.Println("------0",cookie)
+	if err == nil && cookie != ""{
+		sid, _ := url.QueryUnescape(cookie)
+		fmt.Println("------1",cookie,sid)
+		session, err = manager.provider.SessionRead(sid)
+		fmt.Println("session---",session,err)
+		if err == nil{
+			return session
+		}
+	}
+	fmt.Println("------2",cookie)
+
+
+	sid := manager.sessionId()
 		session, err = manager.provider.SessionInit(sid,sessValue)
-		cookie := http.Cookie{
+		log.LogNotice(map[string]interface{}{"sessoin":session,"err":err})
+		ck := http.Cookie{
 			Name: manager.cookieName,
 			Value: url.QueryEscape(sid), //转义特殊符号@#￥%+*-等
 			Path: "/",
 			HttpOnly: true,
-			//Domain: "http://127.0.0.1:18089",
+			Domain:domain,
 			MaxAge: int(manager.maxLifeTime),
 			Secure: false,
 		}
 
+
+
 		//context.SetCookie("name", "Shimin Li", 10, "/", "localhost", false, true)
 		//c.SetCookie(cookie.Name,cookie.Value,cookie.MaxAge,cookie.Path,"",false,true)
-		c.SetCookie(cookie.Name,cookie.Value,cookie.MaxAge,cookie.Path,"127.0.0.1",false,true)
+		c.SetCookie(ck.Name,ck.Value,ck.MaxAge,ck.Path,"154.8.148.131",false,true)
 		session, err = manager.provider.SessionRead(sid)
-
-	} else {
-		sid, _ := url.QueryUnescape(cookie)
-		fmt.Println(cookie,sid)
-		session, err = manager.provider.SessionRead(sid)
-	}
+		log.LogNotice(map[string]interface{}{"session_Start":session,"err":err})
 	return
 }
 
 // SessionDestroy 注销 Session
 func (manager *Manager) SessionDestroy(c *gin.Context)error {
 	cookie, err := c.Cookie(manager.cookieName)
+	sid, _ := url.QueryUnescape(cookie)
+	log.LogNotice(map[string]interface{}{"cookie_del":cookie,"err":err})
 	if err != nil || cookie == "" {
 		return err
 	}
@@ -87,7 +106,8 @@ func (manager *Manager) SessionDestroy(c *gin.Context)error {
 	manager.lock.Lock()
 	defer manager.lock.Unlock()
 
-	err = manager.provider.SessionDestroy(cookie)
+	err = manager.provider.SessionDestroy(sid)
+	log.LogNotice(map[string]interface{}{"session_destory":err})
 	expiredTime := time.Now()
 	newCookie := http.Cookie{
 		Name: manager.cookieName,

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/garyburd/redigo/redis"
 	uuid "github.com/satori/go.uuid"
+	"github.com/ucanme/fastgo/library/log"
 	"github.com/ucanme/fastgo/library/session/common"
 )
 
@@ -17,6 +18,7 @@ func Init()  {
 
 func (s RedisStore)Set(key string, value common.Session) error  {
 	data,_ := json.Marshal(value)
+	log.LogNotice(map[string]interface{}{"session_key":key,"session_val":value})
 	_,err :=connPool.Get().Do("set",key,string(data))
 	connPool.Get().Do("EXPIRE", key, 3600*24)
 	return err

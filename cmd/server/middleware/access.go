@@ -41,7 +41,8 @@ func LoginAuth(c *gin.Context)  {
 			c.Abort()
 			return
 		}
-		_, err= session.Manager.Read(sid)
+		ck, err := session.Manager.Read(sid)
+		clog.LogNotice(map[string]interface{}{"cookie_notice":ck,"err":err})
 		if err != nil {
 			err = session.Manager.SessionDestroy(c)
 			response.Fail(c, consts.ACCOUTN_NOT_LOGIN, "请登陆")
@@ -105,6 +106,14 @@ func Access() gin.HandlerFunc {
 			}
 		}
 
+		clog.LogNotice(map[string]interface{}{"cookie_start":1})
+		for _,v := range c.Request.Cookies(){
+			clog.LogNotice(map[string]interface{}{"name":v.Name,"value":v.Value,"domain":v.Domain})
+		}
+		clog.LogNotice(map[string]interface{}{"cookie_end":1})
+
+		cookie, err := c.Cookie("login_session")
+		clog.LogNotice(map[string]interface{}{"cookie":cookie,"err":err})
 		c.Next()
 		var out struct {
 			RequestID string `json:"request_id"`

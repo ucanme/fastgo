@@ -10,6 +10,7 @@ const (
 
 
 	DB_EXEC_ERR_CODE = 300001
+	REQUEST_FAIL_CODE = 400001
 
 
 
@@ -24,3 +25,4 @@ var USER_PASS_INCORRECT_ERR = errors.New("password incorrect")
 var USER_EXISTS_ERR = errors.New("user already exists")
 var DB_EXEC_ERR = errors.New("db exec fail")
 var MAKE_APPOINT_FAIL =  errors.New("make appoint fail")
+var REQUEST_FAIL = errors.New("request_api_fail")

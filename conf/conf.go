@@ -8,6 +8,7 @@ type ConfigTOML struct {
 	Database DatabaseConfig
 	Kafka    KafkaCfg
 	Server   ServerConfig
+	PlatformApi PlatformApiConfig
 	Auth     struct {
 		Enable   bool
 		Secret   string

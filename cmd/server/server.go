@@ -90,6 +90,7 @@ func GetEngine() *gin.Engine {
 	swaggerInit(r)
 	var gRoute gin.IRouter
 
+	go Ws()
 	gRoute = r
 	gRoute.Use(middleware.Recovery())
 	gRoute.Use(middleware.Access())
@@ -130,6 +131,7 @@ func V1(r gin.IRouter) {
 		g.POST("/login",v1.Login)
 		g.POST("/logout",v1.LoginOut)
 		g.POST("/status",Status)
+		g.POST("/cmd",v1.Cmd)
 	}
 }
 
@@ -147,4 +149,8 @@ func Admin(r gin.IRouter)  {
 func swaggerInit(r gin.IRouter){
 	url := ginSwagger.URL("http://127.0.0.1:19098/swagger/doc.json") // The url pointing to API definition
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+}
+
+func Ws()  {
+	StartWebsocket(":1881")
 }

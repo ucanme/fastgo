@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/ucanme/fastgo/library/log"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -35,7 +35,7 @@ func Get(reqUrl string, reqParams map[string]string) ([]byte, error) {
 	body, err := ioutil.ReadAll(resp.Body)
 	return body, err
 }
-func Post(url string, body []byte, params map[string]string, headers map[string]string) (*http.Response, error) {
+func Post(url string, body []byte, params map[string]string, headers map[string]string) ([]byte, error) {
 	//add post body
 
 	var req *http.Request
@@ -43,7 +43,7 @@ func Post(url string, body []byte, params map[string]string, headers map[string]
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
 	if err != nil {
-		log.Println(err)
+		log.LogError(map[string]interface{}{"url":url,"err":err})
 		return nil, errors.New("new request is fail: %v \n")
 	}
 	req.Header.Set("Content-type", "application/json")
@@ -63,6 +63,12 @@ func Post(url string, body []byte, params map[string]string, headers map[string]
 	}
 	//http client
 	client := &http.Client{Timeout: 10 * time.Second}
-	log.Printf("Go POST URL : %s \n", req.URL.String())
-	return client.Do(req)
+	resp,err :=  client.Do(req)
+	if err != nil{
+		log.LogError(map[string]interface{}{"url":url,"err":err})
+		return nil,err
+	}
+	data,err := ioutil.ReadAll(resp.Body)
+	log.LogNotice(map[string]interface{}{"url":req.URL.String(),"resp":string(data),"err":err})
+	return data,err
 }
