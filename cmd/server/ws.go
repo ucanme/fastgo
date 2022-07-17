@@ -123,10 +123,10 @@ func (wsConn *wsConnection) processLoop() {
 		fmt.Println("moveUnitMap-----------",moveUnitMap)
 
 		type StationInfo struct {
-			StationID string `json:"station_id"`
+			StationID int `json:"station_id"`
 			StationCode string `json:"station_code"`
 			CurrentMoveUnitSN string `json:"current_move_unit_sn"`
-			CurrentMoveUnitID string `json:"current_move_unit_id"`
+			CurrentMoveUnitID int `json:"current_move_unit_id"`
 			MoveUnitStatus int `json:"move_unit_status"`
 		}
 
@@ -140,24 +140,25 @@ func (wsConn *wsConnection) processLoop() {
 		var produceLineList = []ProductionLineInfo{}
 
 
-		for _,v := range manager.Manager.ProductionLineStationMap{
+		fmt.Println("manager.Manager.ProductionLineStationMap",manager.Manager.ProductionLineStationMap)
+		for productionLineId,stationMap := range manager.Manager.ProductionLineStationMap{
 			productLineInfo := ProductionLineInfo{
-				ProductionLineID:   v.ProductionLineId,
-				ProductionLineName: manager.Manager.ProductLineMap[v.ProductionLineId].ProductionLineName,
+				ProductionLineID:   productionLineId,
+				ProductionLineName: manager.Manager.ProductLineMap[productionLineId].ProductionLineName,
 				StationList:        []StationInfo{},
 			}
 
-			for _,station := range manager.Manager.ProductionLineStationMap{
+			for _,station := range stationMap{
 				stationInfo := StationInfo{
 					StationID:         station.StationID,
 					StationCode:       station.StationCode,
 
 				}
 
-				if _,ok := moveUnitMap[productLineInfo.ProductionLineID][station.StationID];ok{
-					stationInfo.CurrentMoveUnitSN=  moveUnitMap[productLineInfo.ProductionLineID][station.StationID].MoveUnitSn
-					stationInfo.CurrentMoveUnitID=  moveUnitMap[productLineInfo.ProductionLineID][station.StationID].MoveUnitID
-					stationInfo.MoveUnitStatus=  moveUnitMap[productLineInfo.ProductionLineID][station.StationID].Status
+				if _,ok := moveUnitMap[productLineInfo.ProductionLineID][station.StationCode];ok{
+					stationInfo.CurrentMoveUnitSN=  moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].MoveUnitSn
+					stationInfo.CurrentMoveUnitID=  moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].MoveUnitID
+					stationInfo.MoveUnitStatus=  moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].Status
 				}
 				productLineInfo.StationList = append(productLineInfo.StationList,stationInfo)
 			}

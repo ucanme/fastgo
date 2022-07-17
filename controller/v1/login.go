@@ -211,16 +211,24 @@ func MoveUnitAdd(c *gin.Context)  {
 		return
 	}
 	moveUnit := models.MoveUnit{}
-	err := db.DB().Where("move_init_sn=?",input.MoveUnitSn).First(&moveUnit).Error
+	err := db.DB().Where("move_unit_sn=?",input.MoveUnitSn).First(&moveUnit).Error
 	if err != nil && err != gorm.ErrRecordNotFound{
 		response.Fail(c,consts.DB_QUERY_ERR_CODE,consts.DB_QUERY_FAIL.Error())
 		return
 	}
-	err = db.DB().Create(&moveUnit).Error
-	if err != nil{
-		response.Fail(c,consts.DB_EXEC_ERR_CODE,consts.DB_EXEC_ERR.Error())
-		return
+
+	if err == nil && moveUnit.ID > 0{
+		err = db.DB().Table("move_unit").Where("move_unit_sn=?",input.MoveUnitSn).Update("deleted",0).Error
+	}else{
+		moveUnit = models.MoveUnit{MoveUnitSn: input.MoveUnitSn}
+
+		err = db.DB().Create(&moveUnit).Error
+		if err != nil{
+			response.Fail(c,consts.DB_EXEC_ERR_CODE,consts.DB_EXEC_ERR.Error())
+			return
+		}
 	}
+
 	response.Success(c,nil)
 }
 
@@ -231,7 +239,7 @@ func MoveUnitDelete(c *gin.Context)  {
 		return
 	}
 	moveUnit := models.MoveUnit{}
-	err := db.DB().Where("move_init_sn=?",input.MoveUnitSn).First(&moveUnit).Error
+	err := db.DB().Where("move_unit_sn=?",input.MoveUnitSn).First(&moveUnit).Error
 	if err != nil && err != gorm.ErrRecordNotFound{
 		response.Fail(c,consts.DB_QUERY_ERR_CODE,consts.DB_QUERY_FAIL.Error())
 		return
@@ -242,7 +250,7 @@ func MoveUnitDelete(c *gin.Context)  {
 		return
 	}
 
-	err = db.DB().Delete(&moveUnit).Error
+	err = db.DB().Table("move_unit").Where("move_unit_sn=?",input.MoveUnitSn).Update("deleted",1).Error
 	if err != nil{
 		response.Fail(c,consts.DB_EXEC_ERR_CODE,consts.DB_EXEC_ERR.Error())
 		return

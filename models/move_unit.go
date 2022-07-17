@@ -1,9 +1,11 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+)
 type MoveUnit struct {
 	MoveUnitSn string `json:"move_unit_sn" gorm:"column:move_unit_sn"`
-	MoveUnitID string `json:"move_unit_id" gorm:"column:move_unit_id"`
+	MoveUnitID int `json:"move_unit_id" gorm:"column:move_unit_id"`
 	Soc int `json:"soc" gorm:"column:soc"`
 	Status int `json:"status" gorm:"column:status"`
 	Speed float64 `json:"speed" gorm:"column:speed"`
@@ -13,9 +15,16 @@ type MoveUnit struct {
 	RingStatus int `json:"ring_status" gorm:"column:ring_status"`
 	WorkDuration int `json:"work_duration" gorm:"column:work_duration"`
 	ProductionLineId int `json:"production_line_id" gorm:"column:production_line_id"`
-	Timestamp int64 `json:"timestamp" gorm:"timestamp"`
-	WorkStatus int `json:"work_status" gorm:"work_status"`
-	gorm.Model
+	Timestamp int64 `json:"timestamp" gorm:"column:timestamp"`
+	WorkStatus int `json:"work_status" gorm:"column:work_status"`
+	Deleted int `json:"deleted" gorm:"column:deleted"`
+	Model
+}
+
+type Model struct {
+	ID        uint `gorm:"primarykey"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func (MoveUnit)TableName()string  {

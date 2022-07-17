@@ -16,6 +16,6 @@ type ProductionLine struct {
 type Station struct {
 	StationCode string `json:"station_code"  gorm:"column:station_code"`
 	ProductionLineId int `json:"production_line_id" gorm:"column:production_line_id"`
-	StationID string `json:"station_id" gorm:"column:station_id"`
+	StationID int `json:"station_id" gorm:"column:station_id"`
 	gorm.Model
 }

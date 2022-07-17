@@ -8,7 +8,7 @@ import (
 
 type manager struct {
 	ProductLineMap map[int]models.ProductionLine
-	ProductionLineStationMap map[int]models.Station
+	ProductionLineStationMap map[int]map[string]models.Station
 }
 
 var Manager manager
@@ -30,9 +30,14 @@ func Init()  {
 		panic(err)
 	}
 
-	Manager.ProductionLineStationMap= map[int]models.Station{}
+	fmt.Println("stationList",stationList)
+	Manager.ProductionLineStationMap= map[int]map[string]models.Station{}
 	for _,v := range stationList{
-		Manager.ProductionLineStationMap[v.ProductionLineId] = v
+		if _,ok := Manager.ProductionLineStationMap[v.ProductionLineId];!ok{
+			Manager.ProductionLineStationMap[v.ProductionLineId] = map[string]models.Station{}
+		}
+		Manager.ProductionLineStationMap[v.ProductionLineId][v.StationCode] = v
+
 	}
 
 }
