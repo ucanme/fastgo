@@ -1,8 +1,13 @@
 package server
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/ucanme/fastgo/internal/manager"
+	"github.com/ucanme/fastgo/library/db"
+	logger "github.com/ucanme/fastgo/library/log"
+	"github.com/ucanme/fastgo/models"
 	"log"
 	"net/http"
 	"sync"
@@ -99,7 +104,73 @@ func (wsConn *wsConnection) processLoop() {
 			log.Println("获取消息出现错误", err.Error())
 			break
 		}
-		log.Println("接收到消息", string(msg.data))
+
+		moveUnitList := []models.MoveUnit{}
+		err = db.DB().Find(&moveUnitList).Error
+		if err != nil{
+			logger.LogError(map[string]interface{}{"ws_send_info_fail":err.Error(),"msg":"get move unit list fail"})
+			continue
+		}
+
+		moveUnitMap := map[int]map[string]models.MoveUnit{} //点station_code-move_unit
+		for _,v := range moveUnitList{
+			if _,ok := moveUnitMap[v.ProductionLineId][v.CurrentStationCode];!ok{
+				moveUnitMap[v.ProductionLineId] = map[string]models.MoveUnit{}
+			}
+			moveUnitMap[v.ProductionLineId][v.CurrentStationCode] = v
+		}
+
+		fmt.Println("moveUnitMap-----------",moveUnitMap)
+
+		type StationInfo struct {
+			StationID string `json:"station_id"`
+			StationCode string `json:"station_code"`
+			CurrentMoveUnitSN string `json:"current_move_unit_sn"`
+			CurrentMoveUnitID string `json:"current_move_unit_id"`
+			MoveUnitStatus int `json:"move_unit_status"`
+		}
+
+		type ProductionLineInfo struct {
+			ProductionLineID int `json:"production_line_id"`
+			ProductionLineName string `json:"production_line_name"`
+			StationList  []StationInfo `json:"station_list"`
+		}
+
+
+		var produceLineList = []ProductionLineInfo{}
+
+
+		for _,v := range manager.Manager.ProductionLineStationMap{
+			productLineInfo := ProductionLineInfo{
+				ProductionLineID:   v.ProductionLineId,
+				ProductionLineName: manager.Manager.ProductLineMap[v.ProductionLineId].ProductionLineName,
+				StationList:        []StationInfo{},
+			}
+
+			for _,station := range manager.Manager.ProductionLineStationMap{
+				stationInfo := StationInfo{
+					StationID:         station.StationID,
+					StationCode:       station.StationCode,
+
+				}
+
+				if _,ok := moveUnitMap[productLineInfo.ProductionLineID][station.StationID];ok{
+					stationInfo.CurrentMoveUnitSN=  moveUnitMap[productLineInfo.ProductionLineID][station.StationID].MoveUnitSn
+					stationInfo.CurrentMoveUnitID=  moveUnitMap[productLineInfo.ProductionLineID][station.StationID].MoveUnitID
+					stationInfo.MoveUnitStatus=  moveUnitMap[productLineInfo.ProductionLineID][station.StationID].Status
+				}
+				productLineInfo.StationList = append(productLineInfo.StationList,stationInfo)
+			}
+			produceLineList = append(produceLineList,productLineInfo)
+		}
+
+
+		fmt.Println("produceLineList-----------------",produceLineList)
+		data,err := json.Marshal(produceLineList)
+		msg = &wsMessage{
+			messageType: websocket.TextMessage,
+			data:        data,
+		}
 		// 修改以下内容把客户端传递的消息传递给处理程序
 		err = wsConn.wsWrite(msg.messageType, msg.data)
 		if err != nil {

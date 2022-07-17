@@ -3,6 +3,7 @@ package models
 import "gorm.io/gorm"
 type MoveUnit struct {
 	MoveUnitSn string `json:"move_unit_sn" gorm:"column:move_unit_sn"`
+	MoveUnitID string `json:"move_unit_id" gorm:"column:move_unit_id"`
 	Soc int `json:"soc" gorm:"column:soc"`
 	Status int `json:"status" gorm:"column:status"`
 	Speed float64 `json:"speed" gorm:"column:speed"`
@@ -13,6 +14,7 @@ type MoveUnit struct {
 	WorkDuration int `json:"work_duration" gorm:"column:work_duration"`
 	ProductionLineId int `json:"production_line_id" gorm:"column:production_line_id"`
 	Timestamp int64 `json:"timestamp" gorm:"timestamp"`
+	WorkStatus int `json:"work_status" gorm:"status"`
 	gorm.Model
 }
 

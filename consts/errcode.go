@@ -13,7 +13,9 @@ const (
 	REQUEST_FAIL_CODE = 400001
 
 	DB_ROWS_AFFECTED_ZERO_CODE= 300002
+	DB_QUERY_ERR_CODE = 300001
 
+	DB_QUERY_NOT_EXIST_CODE = 300003
 
 
 )
@@ -27,6 +29,7 @@ var USER_PASS_INCORRECT_ERR = errors.New("password incorrect")
 var USER_EXISTS_ERR = errors.New("user already exists")
 var DB_EXEC_ERR = errors.New("db exec fail")
 var DB_ROWS_AFFECTED_ZERO_ERR = errors.New("db exec rows affected zero")
-
+var DB_QUERY_FAIL = errors.New("db query fail")
 var MAKE_APPOINT_FAIL =  errors.New("make appoint fail")
 var REQUEST_FAIL = errors.New("request_api_fail")
+var DB_QUERY_NOT_EXIST_ERR = errors.New("db query not exist")

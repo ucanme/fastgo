@@ -10,9 +10,11 @@ import (
 	"github.com/ucanme/fastgo/controller/response"
 	v1 "github.com/ucanme/fastgo/controller/v1"
 	"github.com/ucanme/fastgo/cron"
+	"github.com/ucanme/fastgo/internal/manager"
 	"github.com/ucanme/fastgo/internal/session"
 	"github.com/ucanme/fastgo/library/db"
 	"github.com/ucanme/fastgo/library/log"
+	"github.com/ucanme/fastgo/models"
 	"github.com/urfave/cli"
 	"net"
 	"net/http"
@@ -49,7 +51,8 @@ func run(c *cli.Context) {
 
 	session.Init()
 	cron.Init()
-
+	db.DB().AutoMigrate(&models.Station{})
+	manager.Init()
 	srv := &http.Server{
 		Handler:      GetEngine(),
 		ReadTimeout:  time.Second * 5,
@@ -133,6 +136,9 @@ func V1(r gin.IRouter) {
 		g.POST("/status",Status)
 		g.POST("/cmd",v1.Cmd)
 		g.POST("/report",v1.Report)
+		g.POST("/move_unit/add",v1.MoveUnitAdd)
+		g.POST("/move_unit/delete",v1.MoveUnitDelete)
+		g.POST("/move_unit/bind",v1.MoveUnitBind)
 	}
 }
 

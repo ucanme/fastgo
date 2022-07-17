@@ -4,7 +4,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/jinzhu/gorm"
@@ -185,7 +184,6 @@ func Report(c *gin.Context)  {
 			Timestamp : moveUnitParam.Timestamp,
 		}
 		ret := db.DB().Table("move_unit").Debug().Where("move_unit_sn = ?",moveUnitParam.MoveUnitSn).Update(moveUnit)
-		fmt.Println("err----",err)
 		if ret.Error!= nil{
 			response.Fail(c, consts.DB_EXEC_ERR_CODE, consts.DB_EXEC_ERR.Error())
 			return
@@ -196,6 +194,79 @@ func Report(c *gin.Context)  {
 		}
 		db.DB().AutoMigrate(&models.MoveUnit{})
 		db.DB().AutoMigrate(&models.ProductionLine{})
+	}
+	response.Success(c,nil)
+}
+
+
+
+
+type MoveUnitAddRequest struct {
+	MoveUnitSn string `json:"move_unit_sn"`
+}
+func MoveUnitAdd(c *gin.Context)  {
+	input := MoveUnitAddRequest{}
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+	moveUnit := models.MoveUnit{}
+	err := db.DB().Where("move_init_sn=?",input.MoveUnitSn).First(&moveUnit).Error
+	if err != nil && err != gorm.ErrRecordNotFound{
+		response.Fail(c,consts.DB_QUERY_ERR_CODE,consts.DB_QUERY_FAIL.Error())
+		return
+	}
+	err = db.DB().Create(&moveUnit).Error
+	if err != nil{
+		response.Fail(c,consts.DB_EXEC_ERR_CODE,consts.DB_EXEC_ERR.Error())
+		return
+	}
+	response.Success(c,nil)
+}
+
+func MoveUnitDelete(c *gin.Context)  {
+	input := MoveUnitAddRequest{}
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+	moveUnit := models.MoveUnit{}
+	err := db.DB().Where("move_init_sn=?",input.MoveUnitSn).First(&moveUnit).Error
+	if err != nil && err != gorm.ErrRecordNotFound{
+		response.Fail(c,consts.DB_QUERY_ERR_CODE,consts.DB_QUERY_FAIL.Error())
+		return
+	}
+
+	if err == gorm.ErrRecordNotFound{
+		response.Fail(c,consts.DB_QUERY_NOT_EXIST_CODE,consts.DB_QUERY_NOT_EXIST_ERR.Error())
+		return
+	}
+
+	err = db.DB().Delete(&moveUnit).Error
+	if err != nil{
+		response.Fail(c,consts.DB_EXEC_ERR_CODE,consts.DB_EXEC_ERR.Error())
+		return
+	}
+	response.Success(c,nil)
+}
+
+type MoveUnitBindRequest struct {
+	MoveUnitSn string `json:"move_unit_sn"`
+	ProductionLineID int `json:"production_line_id"`
+
+}
+
+func MoveUnitBind(c *gin.Context)  {
+	input := MoveUnitBindRequest{}
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+
+	err := db.DB().Where("move_unit_sn = ?").Update(map[string]interface{}{"production_line_id":input.ProductionLineID}).Error
+	if err != nil{
+		response.Fail(c,consts.DB_EXEC_ERR_CODE,consts.DB_EXEC_ERR.Error())
+		return
 	}
 	response.Success(c,nil)
 }
