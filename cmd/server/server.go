@@ -139,6 +139,7 @@ func V1(r gin.IRouter) {
 		g.POST("/move_unit/add",v1.MoveUnitAdd)
 		g.POST("/move_unit/delete",v1.MoveUnitDelete)
 		g.POST("/move_unit/bind",v1.MoveUnitBind)
+		g.POST("/move_unit/update",v1.MoveUnitUpdate)
 	}
 }
 

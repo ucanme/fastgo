@@ -270,3 +270,23 @@ func MoveUnitBind(c *gin.Context)  {
 	}
 	response.Success(c,nil)
 }
+
+
+type MoveUnitUpdateRequest struct {
+	MoveUnitSn string `json:"move_unit_sn"`
+	WorkStatus int `json:"work_status"` // 0停用1启用
+}
+
+func MoveUnitUpdate(c *gin.Context)  {
+	input := MoveUnitUpdateRequest{}
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+	err := db.DB().Table("move_unit").Where("move_unit_sn=?",input.MoveUnitSn).Update(map[string]interface{}{"work_status":input.WorkStatus})
+	if err != nil{
+		response.Fail(c, consts.DB_EXEC_ERR_CODE, consts.DB_EXEC_ERR.Error())
+		return
+	}
+	response.Success(c,nil)
+}
