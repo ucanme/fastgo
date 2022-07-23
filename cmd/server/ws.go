@@ -186,7 +186,7 @@ func (wsConn *wsConnection) processLoop() {
 func (wsConn *wsConnection) wsReadLoop() {
 	// 设置消息的最大长度
 	wsConn.wsSocket.SetReadLimit(maxMessageSize)
-	wsConn.wsSocket.SetReadDeadline(time.Now().Add(pongWait))
+	//wsConn.wsSocket.SetReadDeadline(time.Now().Add(pongWait))
 	for {
 		// 读一个message
 		msgType, data, err := wsConn.wsSocket.ReadMessage()
@@ -216,10 +216,10 @@ type EventMessage struct {
 
 // 发送消息给客户端
 func (wsConn *wsConnection) wsWriteLoop() {
-	ticker := time.NewTicker(pingPeriod)
-	defer func() {
-		ticker.Stop()
-	}()
+	//ticker := time.NewTicker(pingPeriod)
+	//defer func() {
+	//	ticker.Stop()
+	//}()
 	for {
 		select {
 		// 取一个应答
@@ -234,12 +234,12 @@ func (wsConn *wsConnection) wsWriteLoop() {
 		case <-wsConn.closeChan:
 			// 获取到关闭通知
 			return
-		case <-ticker.C:
+		//case <-ticker.C:
 			// 出现超时情况
-			wsConn.wsSocket.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := wsConn.wsSocket.WriteMessage(websocket.PingMessage, nil); err != nil {
-				return
-			}
+			//wsConn.wsSocket.SetWriteDeadline(time.Now().Add(writeWait))
+			//if err := wsConn.wsSocket.WriteMessage(websocket.PingMessage, nil); err != nil {
+			//	return
+			//}
 		}
 	}
 }
