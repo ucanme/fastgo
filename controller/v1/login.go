@@ -469,3 +469,20 @@ func Stop(c *gin.Context)  {
 
 	response.Success(c,nil)
 }
+
+func Start(c *gin.Context)  {
+	var input ProductionLineMoveReq
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+
+
+	err := db.DB().Table("move_unit").Where("production_line_id = ?",input.ProductionLineID).Update("work_status",1).Error
+	if err != nil{
+		response.Fail(c, consts.DB_EXEC_ERR_CODE, consts.DB_EXEC_ERR.Error())
+		return
+	}
+
+	response.Success(c,nil)
+}
