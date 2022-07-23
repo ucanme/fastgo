@@ -37,7 +37,6 @@ func Init()  {
 			Manager.ProductionLineStationMap[v.ProductionLineId] = map[string]models.Station{}
 		}
 		Manager.ProductionLineStationMap[v.ProductionLineId][v.StationCode] = v
-
 	}
 
 }

@@ -128,6 +128,7 @@ func (wsConn *wsConnection) processLoop() {
 			CurrentMoveUnitSN string `json:"current_move_unit_sn"`
 			CurrentMoveUnitID int `json:"current_move_unit_id"`
 			MoveUnitStatus int `json:"move_unit_status"`
+			WorkStatus int `json:"work_status"`
 		}
 
 		type ProductionLineInfo struct {
@@ -152,13 +153,13 @@ func (wsConn *wsConnection) processLoop() {
 				stationInfo := StationInfo{
 					StationID:         station.StationID,
 					StationCode:       station.StationCode,
-
 				}
 
 				if _,ok := moveUnitMap[productLineInfo.ProductionLineID][station.StationCode];ok{
 					stationInfo.CurrentMoveUnitSN=  moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].MoveUnitSn
 					stationInfo.CurrentMoveUnitID=  moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].MoveUnitID
 					stationInfo.MoveUnitStatus=  moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].Status
+					stationInfo.WorkStatus = moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].WorkStatus
 				}
 				productLineInfo.StationList = append(productLineInfo.StationList,stationInfo)
 			}

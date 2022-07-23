@@ -137,8 +137,12 @@ func V1(r gin.IRouter) {
 		g.POST("/cmd",v1.Cmd)
 		g.POST("/report",v1.Report)
 		g.POST("/move_unit/add",v1.MoveUnitAdd)
+		g.POST("/move_unit/list",v1.MoveUnitList)
+
 		g.POST("/move_unit/delete",v1.MoveUnitDelete)
 		g.POST("/move_unit/bind",v1.MoveUnitBind)
+		g.POST("/move_unit/unbind",v1.MoveUnitUnbind)
+
 		g.POST("/move_unit/update",v1.MoveUnitUpdate)
 	}
 }

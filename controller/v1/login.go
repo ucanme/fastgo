@@ -202,7 +202,8 @@ func Report(c *gin.Context)  {
 
 
 type MoveUnitAddRequest struct {
-	MoveUnitSn string `json:"move_unit_sn"`
+	MoveUnitSn string `json:"move_unit_sn" binding:"required"`
+	RingSn string `json:"ring_sn" binding:"required"`
 }
 func MoveUnitAdd(c *gin.Context)  {
 	input := MoveUnitAddRequest{}
@@ -218,9 +219,12 @@ func MoveUnitAdd(c *gin.Context)  {
 	}
 
 	if err == nil && moveUnit.ID > 0{
-		err = db.DB().Table("move_unit").Where("move_unit_sn=?",input.MoveUnitSn).Update("deleted",0).Error
+		err = db.DB().Table("move_unit").Where("move_unit_sn=?",input.MoveUnitSn).Update(map[string]interface{}{
+			"deleted":0,
+			"ring_sn" : input.RingSn,
+		}).Error
 	}else{
-		moveUnit = models.MoveUnit{MoveUnitSn: input.MoveUnitSn}
+		moveUnit = models.MoveUnit{MoveUnitSn: input.MoveUnitSn,RingSn: input.RingSn}
 
 		err = db.DB().Create(&moveUnit).Error
 		if err != nil{
@@ -297,4 +301,42 @@ func MoveUnitUpdate(c *gin.Context)  {
 		return
 	}
 	response.Success(c,nil)
+}
+
+
+type ProductionLineRequest struct {
+	ProductionLineId string
+}
+
+
+type MoveUnitListRequest struct {
+	ProductionLineID int `json:"production_line_id"`
+	MoveUnitSN string `json:"move_unit_sn"`
+}
+func MoveUnitList(c *gin.Context)  {
+	input := MoveUnitListRequest{}
+	c.ShouldBindWith(&input, binding.JSON);
+	db := db.DB().Table("move_unit")
+	if input.ProductionLineID > 0 {
+		db = db.Where("production_line_id = ?",input.ProductionLineID)
+	}
+	if input.MoveUnitSN != ""{
+		db = db.Where("move_unit_sn = ?",input.MoveUnitSN)
+	}
+	moveUnitList := []models.MoveUnit{}
+	err := db.Find(&moveUnitList).Error
+	if err != nil{
+		response.Fail(c,consts.DB_QUERY_ERR_CODE,consts.DB_EXEC_ERR.Error())
+		return
+	}
+	response.Success(c,moveUnitList)
+}
+
+
+
+type MoveUnitUnbindRequest struct {
+
+}
+func MoveUnitUnbind(c *gin.Context)  {
+
 }
