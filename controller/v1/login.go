@@ -10,6 +10,7 @@ import (
 	"github.com/ucanme/fastgo/conf"
 	"github.com/ucanme/fastgo/consts"
 	"github.com/ucanme/fastgo/controller/response"
+	"github.com/ucanme/fastgo/internal/manager"
 	"github.com/ucanme/fastgo/internal/session"
 	"github.com/ucanme/fastgo/library/db"
 	"github.com/ucanme/fastgo/library/log"
@@ -335,8 +336,136 @@ func MoveUnitList(c *gin.Context)  {
 
 
 type MoveUnitUnbindRequest struct {
-
+	MoveUnitSn string `json:"move_unit_sn"`
 }
 func MoveUnitUnbind(c *gin.Context)  {
+	input := MoveUnitUpdateRequest{}
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+	err := db.DB().Table("move_unit").Where("move_unit_sn=?",input.MoveUnitSn).Update(map[string]interface{}{"production_line_id":"","work_status": 0})
+	if err != nil{
+		response.Fail(c, consts.DB_EXEC_ERR_CODE, consts.DB_EXEC_ERR.Error())
+		return
+	}
+	response.Success(c,nil)
+}
 
+
+type ProductionLineMoveReq struct {
+	ProductionLineID int `json:"production_line_id" binding:"required"`
+}
+
+
+
+
+
+type MoveCmdInfo struct {
+	MoveUnitSn        string `json:"move_unit_sn"`
+	SourceStationCode string `json:"source_station_code"`
+	TargetStationCode string `json:"target_station_code"`
+}
+
+func Forward(c *gin.Context)  {
+	var input ProductionLineMoveReq
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+
+	moveUnits := []models.MoveUnit{}
+	err := db.DB().Table("move_unit").Where("production_line_id = ? && work_status =1",input.ProductionLineID).Find(&moveUnits).Error
+	if err == gorm.ErrRecordNotFound{
+		response.Fail(c, consts.NO_MOVEUNIT_IN_WORK_CODE, consts.NO_MOVEUNIT_IN_WORK_ERR.Error())
+		return
+	}
+
+	cmdList := []MoveCmdInfo{}
+	for _,moveUnit := range moveUnits{
+
+		stationCode := moveUnit.CurrentStationCode
+		if stationCode == ""{
+			log.LogError(map[string]interface{}{"info":"move_unit_not_station station_code_empty","moveUnit" : moveUnit})
+			continue
+		}
+
+		if _, ok := manager.Manager.ProductionLineStationMap[moveUnit.ProductionLineId]; !ok {
+			log.LogError(map[string]interface{}{"info":" system error ","ProductionLineStationMap" :  manager.Manager.ProductionLineStationMap,"production_line ": moveUnit.ProductionLineId})
+			continue
+		}
+
+		index,ok := manager.Manager.ProductionLineStationIndex[moveUnit.ProductionLineId][moveUnit.CurrentStationCode];
+		if !ok{
+			log.LogError(map[string]interface{}{"info":" system error ","moveUnit.CurrentStationCode not in  ProductionLineStationMap" :  manager.Manager.ProductionLineStationMap[moveUnit.ProductionLineId],"current_station_code ": moveUnit.CurrentStationCode})
+			continue
+		}
+
+		stationCnt := len(manager.Manager.ProductionLineStationSort[moveUnit.ProductionLineId])
+
+		//已经到达终点
+		if index +1 >= stationCnt-1 {
+			continue
+		}
+		nextStataion := manager.Manager.ProductionLineStationSort[moveUnit.ProductionLineId][index +1]
+		cmdInfo := MoveCmdInfo{
+			MoveUnitSn:        moveUnit.MoveUnitSn,
+			SourceStationCode: moveUnit.CurrentStationCode,
+			TargetStationCode: nextStataion.StationCode,
+		}
+
+		cmdList = append(cmdList,cmdInfo)
+	}
+
+	log.LogNotice(map[string]interface{}{"move cmdList" : cmdList})
+
+	if len(cmdList) == 0{
+		response.Fail(c, consts.NO_MOVEUNIT_CAN_MOVE_FORWARD_CODE, consts.NO_MOVEUNIT_CAN_MOVE_FORWARD.Error())
+		return
+	}
+
+	payload,_ :=json.Marshal(cmdList)
+	
+	cmd := CmdReq{
+		CmdType: "move",
+		Payload: string(payload),
+	}
+
+	data,_ := json.Marshal(cmd)
+
+	resp,err := util.Post(conf.Config.PlatformApi.Host+"/v1/cmd",data, map[string]string{}, map[string]string{})
+	if err != nil{
+		response.Fail(c, consts.REQUEST_FAIL_CODE, consts.REQUEST_FAIL.Error())
+		return
+	}
+	apiResp := CmdResp{}
+	err = json.Unmarshal(resp,&apiResp)
+	if err != nil{
+		response.Fail(c, consts.REQUEST_FAIL_CODE, consts.REQUEST_FAIL.Error())
+		return
+	}
+	if apiResp.ErrorCode != 0 {
+		response.Fail(c, consts.REQUEST_FAIL_CODE, apiResp.ErrorMsg)
+		return
+	}
+	response.Success(c,nil)
+}
+
+
+
+func Stop(c *gin.Context)  {
+	var input ProductionLineMoveReq
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+
+
+	err := db.DB().Table("move_unit").Where("production_line_id = ?",input.ProductionLineID).Update("work_status",0).Error
+	if err != nil{
+		response.Fail(c, consts.DB_EXEC_ERR_CODE, consts.DB_EXEC_ERR.Error())
+		return
+	}
+
+	response.Success(c,nil)
 }

@@ -3,7 +3,6 @@ package util
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"github.com/ucanme/fastgo/library/log"
 	"io/ioutil"
 	"net/http"
@@ -39,7 +38,6 @@ func Post(url string, body []byte, params map[string]string, headers map[string]
 	//add post body
 
 	var req *http.Request
-	fmt.Println(string(body))
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
 	if err != nil {
@@ -65,10 +63,10 @@ func Post(url string, body []byte, params map[string]string, headers map[string]
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp,err :=  client.Do(req)
 	if err != nil{
-		log.LogError(map[string]interface{}{"url":url,"err":err})
+		log.LogError(map[string]interface{}{"url":url,"err":err,"request_body":string(body)})
 		return nil,err
 	}
 	data,err := ioutil.ReadAll(resp.Body)
-	log.LogNotice(map[string]interface{}{"url":req.URL.String(),"resp":string(data),"err":err})
+	log.LogNotice(map[string]interface{}{"url":req.URL.String(),"request_body":string(body), "resp":string(data),"err":err})
 	return data,err
 }

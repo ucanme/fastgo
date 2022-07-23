@@ -17,6 +17,10 @@ const (
 
 	DB_QUERY_NOT_EXIST_CODE = 300003
 
+	NO_MOVEUNIT_IN_WORK_CODE  = 400001
+
+	NO_MOVEUNIT_CAN_MOVE_FORWARD_CODE = 500001
+
 
 )
 
@@ -33,3 +37,7 @@ var DB_QUERY_FAIL = errors.New("db query fail")
 var MAKE_APPOINT_FAIL =  errors.New("make appoint fail")
 var REQUEST_FAIL = errors.New("request_api_fail")
 var DB_QUERY_NOT_EXIST_ERR = errors.New("db query not exist")
+
+var NO_MOVEUNIT_IN_WORK_ERR = errors.New("no move unit work")
+
+var NO_MOVEUNIT_CAN_MOVE_FORWARD = errors.New("no move unit can move forward")
