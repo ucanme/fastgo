@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/jinzhu/gorm"
@@ -155,12 +156,14 @@ type MoveUnit []struct {
 func Report(c *gin.Context)  {
 	input := ReportReq{}
 	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		fmt.Println("err1",err)
 		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
 		return
 	}
 	moveUnitParamList := MoveUnit{}
 	err := json.Unmarshal([]byte(input.Payload),&moveUnitParamList)
 	if err != nil{
+		fmt.Println("err",err)
 		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
 		return
 	}
@@ -184,7 +187,21 @@ func Report(c *gin.Context)  {
 			ProductionLineId:   moveUnitParam.ProductionLineId,
 			Timestamp : moveUnitParam.Timestamp,
 		}
-		ret := db.DB().Table("move_unit").Debug().Where("move_unit_sn = ?",moveUnitParam.MoveUnitSn).Update(moveUnit)
+
+		updates := map[string]interface{}{
+			"soc" : moveUnit.Soc,
+			"status":moveUnit.Status,
+			"speed" : moveUnit.Speed,
+			"current_station_code":moveUnit.CurrentStationCode,
+			"is_in_station" : moveUnit.IsInStation,
+			"ring_angle" : moveUnit.RingAngle,
+			"ring_status":moveUnit.RingStatus,
+			"work_duration" : moveUnit.WorkDuration,
+			"production_line_id" : moveUnit.ProductionLineId,
+			"timestamp":moveUnit.Timestamp,
+		}
+
+		ret := db.DB().Table("move_unit").Debug().Where("move_unit_sn = ?",moveUnitParam.MoveUnitSn).Update(updates)
 		if ret.Error!= nil{
 			response.Fail(c, consts.DB_EXEC_ERR_CODE, consts.DB_EXEC_ERR.Error())
 			return
