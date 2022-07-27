@@ -361,7 +361,7 @@ func MoveUnitUnbind(c *gin.Context)  {
 		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
 		return
 	}
-	err := db.DB().Table("move_unit").Where("move_unit_sn=?",input.MoveUnitSn).Update(map[string]interface{}{"production_line_id":"","work_status": 0})
+	err := db.DB().Table("move_unit").Where("move_unit_sn=?",input.MoveUnitSn).Update(map[string]interface{}{"production_line_id":0,"work_status": 0})
 	if err != nil{
 		response.Fail(c, consts.DB_EXEC_ERR_CODE, consts.DB_EXEC_ERR.Error())
 		return
