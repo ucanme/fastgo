@@ -112,12 +112,17 @@ func (wsConn *wsConnection) processLoop() {
 			continue
 		}
 
+		fmt.Println("move uinit _ list",moveUnitList)
+
 		moveUnitMap := map[int]map[string]models.MoveUnit{} //点station_code-move_unit
 		for _,v := range moveUnitList{
-			if _,ok := moveUnitMap[v.ProductionLineId][v.CurrentStationCode];!ok{
+			fmt.Println(v.CurrentStationCode)
+			if _,ok := moveUnitMap[v.ProductionLineId];!ok{
 				moveUnitMap[v.ProductionLineId] = map[string]models.MoveUnit{}
 			}
-			moveUnitMap[v.ProductionLineId][v.CurrentStationCode] = v
+			if v.CurrentStationCode != ""{
+				moveUnitMap[v.ProductionLineId][v.CurrentStationCode] = v
+			}
 		}
 
 		fmt.Println("moveUnitMap-----------",moveUnitMap)
