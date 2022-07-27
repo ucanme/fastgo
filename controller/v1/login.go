@@ -221,7 +221,6 @@ func Report(c *gin.Context)  {
 
 type MoveUnitAddRequest struct {
 	MoveUnitSn string `json:"move_unit_sn" binding:"required"`
-	RingSn string `json:"ring_sn" binding:"required"`
 }
 func MoveUnitAdd(c *gin.Context)  {
 	input := MoveUnitAddRequest{}
@@ -239,10 +238,9 @@ func MoveUnitAdd(c *gin.Context)  {
 	if err == nil && moveUnit.ID > 0{
 		err = db.DB().Table("move_unit").Where("move_unit_sn=?",input.MoveUnitSn).Update(map[string]interface{}{
 			"deleted":0,
-			"ring_sn" : input.RingSn,
 		}).Error
 	}else{
-		moveUnit = models.MoveUnit{MoveUnitSn: input.MoveUnitSn,RingSn: input.RingSn}
+		moveUnit = models.MoveUnit{MoveUnitSn: input.MoveUnitSn}
 
 		err = db.DB().Create(&moveUnit).Error
 		if err != nil{

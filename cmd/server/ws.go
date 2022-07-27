@@ -129,6 +129,9 @@ func (wsConn *wsConnection) processLoop() {
 			CurrentMoveUnitID int `json:"current_move_unit_id"`
 			MoveUnitStatus int `json:"move_unit_status"`
 			WorkStatus int `json:"work_status"`
+			WorkDuration int `json:"work_duration"`
+			Soc int `json:"soc"`
+			RingAngle float32 `json:"ring_angle"`
 		}
 
 		type ProductionLineInfo struct {
@@ -141,7 +144,7 @@ func (wsConn *wsConnection) processLoop() {
 		var produceLineList = []ProductionLineInfo{}
 
 
-		fmt.Println("manager.Manager.ProductionLineStationMap",manager.Manager.ProductionLineStationMap)
+		logger.LogNotice(map[string]interface{}{"manager.Manager.ProductionLineStationMap":manager.Manager.ProductionLineStationMap})
 		for productionLineId,stationMap := range manager.Manager.ProductionLineStationMap{
 			productLineInfo := ProductionLineInfo{
 				ProductionLineID:   productionLineId,
@@ -160,6 +163,9 @@ func (wsConn *wsConnection) processLoop() {
 					stationInfo.CurrentMoveUnitID=  moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].MoveUnitID
 					stationInfo.MoveUnitStatus=  moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].Status
 					stationInfo.WorkStatus = moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].WorkStatus
+					stationInfo.RingAngle = moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].RingAngle
+					stationInfo.Soc = moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].Soc
+					stationInfo.WorkDuration = moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].WorkDuration
 				}
 				productLineInfo.StationList = append(productLineInfo.StationList,stationInfo)
 			}
@@ -167,7 +173,7 @@ func (wsConn *wsConnection) processLoop() {
 		}
 
 
-		fmt.Println("produceLineList-----------------",produceLineList)
+	logger.LogNotice(map[string]interface{}{"produceLineList":produceLineList})
 		data,err := json.Marshal(produceLineList)
 		msg = &wsMessage{
 			messageType: websocket.TextMessage,

@@ -5,7 +5,6 @@ import (
 )
 type MoveUnit struct {
 	MoveUnitSn string `json:"move_unit_sn" gorm:"column:move_unit_sn"`
-	RingSn string `json:"ring_sn" gorm:"column:ring_sn"`
 	MoveUnitID int `json:"move_unit_id" gorm:"column:move_unit_id"`
 	Soc int `json:"soc" gorm:"column:soc"`
 	Status int `json:"status" gorm:"column:status"`
