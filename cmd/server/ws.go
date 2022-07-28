@@ -137,6 +137,8 @@ func (wsConn *wsConnection) processLoop() {
 			WorkDuration int `json:"work_duration"`
 			Soc int `json:"soc"`
 			RingAngle float32 `json:"ring_angle"`
+			Speed float64 `json:"speed"`
+			RingStatus int `json:"ring_status"`
 		}
 
 		type ProductionLineInfo struct {
@@ -171,6 +173,8 @@ func (wsConn *wsConnection) processLoop() {
 					stationInfo.RingAngle = moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].RingAngle
 					stationInfo.Soc = moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].Soc
 					stationInfo.WorkDuration = moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].WorkDuration
+					stationInfo.Speed = moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].Speed
+					stationInfo.RingStatus = moveUnitMap[productLineInfo.ProductionLineID][station.StationCode].RingStatus
 				}
 				productLineInfo.StationList = append(productLineInfo.StationList,stationInfo)
 			}
