@@ -88,7 +88,7 @@ func (manager *Manager) SessionStart(c *gin.Context,sessValue string) (session c
 
 		//context.SetCookie("name", "Shimin Li", 10, "/", "localhost", false, true)
 		//c.SetCookie(cookie.Name,cookie.Value,cookie.MaxAge,cookie.Path,"",false,true)
-		c.SetCookie(ck.Name,ck.Value,ck.MaxAge,ck.Path,"192.168.201.101",false,false)
+		c.SetCookie(ck.Name,ck.Value,ck.MaxAge,ck.Path,"192.168.201.101,154.8.148.131",false,false)
 		session, err = manager.provider.SessionRead(sid)
 		log.LogNotice(map[string]interface{}{"session_Start":session,"err":err})
 	return

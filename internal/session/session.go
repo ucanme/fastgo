@@ -13,6 +13,7 @@ func Init()  {
 	provider := session.NewProvider("redis")
 	session.RegisterProvider("redis_prodvider",provider)
 	//实例化manager
+
 	Manager,err = session.NewManager("redis_prodvider","login_session",123213)
 	fmt.Println(Manager)
 	if err!=nil{
