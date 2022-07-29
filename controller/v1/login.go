@@ -184,7 +184,6 @@ func Report(c *gin.Context)  {
 			RingAngle:          moveUnitParam.RingAngle,
 			RingStatus:         moveUnitParam.RingStatus,
 			WorkDuration:       moveUnitParam.WorkDuration,
-			ProductionLineId:   moveUnitParam.ProductionLineId,
 			Timestamp : moveUnitParam.Timestamp,
 		}
 
@@ -197,7 +196,6 @@ func Report(c *gin.Context)  {
 			"ring_angle" : moveUnit.RingAngle,
 			"ring_status":moveUnit.RingStatus,
 			"work_duration" : moveUnit.WorkDuration,
-			"production_line_id" : moveUnit.ProductionLineId,
 			"timestamp":moveUnit.Timestamp,
 		}
 
