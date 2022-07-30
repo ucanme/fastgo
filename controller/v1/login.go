@@ -149,7 +149,6 @@ type MoveUnit []struct {
 	RingAngle float32 `json:"ring_angle"`
 	RingStatus int `json:"ring_status"`
 	WorkDuration int `json:"work_duration"`
-	ProductionLineId int `json:"production_line_id"`
 	Timestamp int64 `json:"timestamp"`
 }
 
@@ -184,7 +183,7 @@ func Report(c *gin.Context)  {
 			RingAngle:          moveUnitParam.RingAngle,
 			RingStatus:         moveUnitParam.RingStatus,
 			WorkDuration:       moveUnitParam.WorkDuration,
-			Timestamp : moveUnitParam.Timestamp,
+			Timestamp : 		moveUnitParam.Timestamp,
 		}
 
 		updates := map[string]interface{}{
@@ -208,8 +207,6 @@ func Report(c *gin.Context)  {
 			response.Fail(c, consts.DB_ROWS_AFFECTED_ZERO_CODE, consts.DB_ROWS_AFFECTED_ZERO_ERR.Error())
 			return
 		}
-		db.DB().AutoMigrate(&models.MoveUnit{})
-		db.DB().AutoMigrate(&models.ProductionLine{})
 	}
 	response.Success(c,nil)
 }
@@ -289,7 +286,18 @@ func MoveUnitBind(c *gin.Context)  {
 		return
 	}
 
-	err := db.DB().Where("move_unit_sn = ?").Update(map[string]interface{}{"production_line_id":input.ProductionLineID}).Error
+	moveUnit := models.MoveUnit{}
+	err := db.DB().Where("move_unit_sn = ?",input.MoveUnitSn).First(&moveUnit).Error
+	if (err != nil && err != gorm.ErrRecordNotFound) ||  moveUnit.MoveUnitSn=="" || moveUnit.Deleted == 1 {
+		response.Fail(c, consts.DB_QUERY_ERR_CODE,"小车不存在")
+		return
+	}
+	if moveUnit.ProductionLineId != 0{
+		response.Fail(c,consts.DB_QUERY_ERR_CODE,"小车已经绑定产线")
+		return
+	}
+
+	err = db.DB().Where("move_unit_sn = ?").Update(map[string]interface{}{"production_line_id":input.ProductionLineID}).Error
 	if err != nil{
 		response.Fail(c,consts.DB_EXEC_ERR_CODE,consts.DB_EXEC_ERR.Error())
 		return
