@@ -152,6 +152,15 @@ type MoveUnit []struct {
 	Timestamp int64 `json:"timestamp"`
 }
 
+
+type ArmReportPayload []ArmReportInfo
+type ArmReportInfo struct {
+	ArmSn          string    `json:"arm_sn"`
+	Status         int       `json:"status"`
+	JointPostion   []float64 `json:"joint_postion"`
+	ActuralPostion []float64 `json:"actural_postion"`
+}
+
 func Report(c *gin.Context)  {
 	input := ReportReq{}
 	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
@@ -159,6 +168,28 @@ func Report(c *gin.Context)  {
 		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
 		return
 	}
+
+	if input.EventType == "arm_status_report"{
+		armReportPayload := ArmReportPayload{}
+		err := json.Unmarshal([]byte(input.Payload),&armReportPayload)
+		if err != nil{
+			fmt.Println("err",err)
+			response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+			return
+		}
+		for _,armInfo := range armReportPayload{
+			err := db.DB().Where("arm_sn = ?",armInfo.ArmSn).Updates(map[string]interface{
+			}{
+				"status" :armInfo.Status,
+				"joint_position" : armInfo.JointPostion,
+				"actual_position" : armInfo.ActuralPostion,
+			}).Error
+			if err != nil{
+				response.Fail(c, consts.DB_EXEC_ERR_CODE, consts.DB_EXEC_ERR.Error())
+			}
+		}
+
+	}else{
 	moveUnitParamList := MoveUnit{}
 	err := json.Unmarshal([]byte(input.Payload),&moveUnitParamList)
 	if err != nil{
@@ -167,12 +198,13 @@ func Report(c *gin.Context)  {
 		return
 	}
 
+
 	if len(moveUnitParamList) == 0{
 		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
 		return
 	}
 
-	for _,moveUnitParam := range moveUnitParamList{
+	for _,moveUnitParam := range moveUnitParamList {
 		moveUnit := &models.MoveUnit{
 			MoveUnitSn:         moveUnitParam.MoveUnitSn,
 			Soc:                moveUnitParam.Soc,
@@ -183,31 +215,31 @@ func Report(c *gin.Context)  {
 			RingAngle:          moveUnitParam.RingAngle,
 			RingStatus:         moveUnitParam.RingStatus,
 			WorkDuration:       moveUnitParam.WorkDuration,
-			Timestamp : 		moveUnitParam.Timestamp,
+			Timestamp:          moveUnitParam.Timestamp,
 		}
 
 		updates := map[string]interface{}{
-			"soc" : moveUnit.Soc,
-			"status":moveUnit.Status,
-			"speed" : moveUnit.Speed,
-			"current_station_code":moveUnit.CurrentStationCode,
-			"is_in_station" : moveUnit.IsInStation,
-			"ring_angle" : moveUnit.RingAngle,
-			"ring_status":moveUnit.RingStatus,
-			"work_duration" : moveUnit.WorkDuration,
-			"timestamp":moveUnit.Timestamp,
+			"soc":                  moveUnit.Soc,
+			"status":               moveUnit.Status,
+			"speed":                moveUnit.Speed,
+			"current_station_code": moveUnit.CurrentStationCode,
+			"is_in_station":        moveUnit.IsInStation,
+			"ring_angle":           moveUnit.RingAngle,
+			"ring_status":          moveUnit.RingStatus,
+			"work_duration":        moveUnit.WorkDuration,
+			"timestamp":            moveUnit.Timestamp,
 		}
 
-		ret := db.DB().Table("move_unit").Debug().Where("move_unit_sn = ?",moveUnitParam.MoveUnitSn).Update(updates)
-		if ret.Error!= nil{
+		ret := db.DB().Table("move_unit").Debug().Where("move_unit_sn = ?", moveUnitParam.MoveUnitSn).Update(updates)
+		if ret.Error != nil {
 			response.Fail(c, consts.DB_EXEC_ERR_CODE, consts.DB_EXEC_ERR.Error())
 			return
 		}
-		if ret.RowsAffected == 0{
+		if ret.RowsAffected == 0 {
 			response.Fail(c, consts.DB_ROWS_AFFECTED_ZERO_CODE, consts.DB_ROWS_AFFECTED_ZERO_ERR.Error())
 			return
 		}
-	}
+	}	}
 	response.Success(c,nil)
 }
 
