@@ -3,7 +3,7 @@ services:
   fast-go:
     container_name: fast-go
     restart: always
-    ports: 
+    ports:
      - 19098:19098
     image: harbor.cn/group/fastgo:NO_TAG.1.2132ffa
     network_mode: "host"
@@ -14,6 +14,25 @@ services:
     volumes:
       - ./config.toml:/root/config.toml
       - ./log:/root/log
+    entrypoint:version: '3.2'
+services:
+  fast-go:
+    container_name: fast-go
+    restart: always
+    ports:
+      - 19098:19098
+    image: harbor.cn/group/fastgo:NO_TAG.1.2132ffa
+    network_mode: "host"
+    logging:
+      options:
+        max-size: "1g"
+        max-file: "2"
+    volumes:
+      - ./config.toml:/root/config.toml
+      - ./log:/root/log
     entrypoint:
+      - fastgo
+      - server
+
       - fastgo
       - server

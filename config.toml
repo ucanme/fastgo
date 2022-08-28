@@ -34,7 +34,7 @@ Host = "http://127.0.0.1:19098/v1/assets/"
 
 [Redis]
 Host = "127.0.0.1:6379"
-Password = "12345678"
+Password = "123456"
 
 
 [PlatformApi]
