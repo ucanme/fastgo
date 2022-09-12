@@ -14,10 +14,13 @@ import (
 	"github.com/ucanme/fastgo/internal/manager"
 	"github.com/ucanme/fastgo/internal/session"
 	"github.com/ucanme/fastgo/library/db"
+	"github.com/ucanme/fastgo/library/httputil"
 	"github.com/ucanme/fastgo/library/log"
 	"github.com/ucanme/fastgo/models"
 	"github.com/ucanme/fastgo/util"
+	"io/ioutil"
 	"net/url"
+	"strconv"
 )
 
 type loginReq struct {
@@ -105,33 +108,37 @@ type CmdResp struct {
 	ErrorCode int `json:"error_no"`
 	ErrorMsg string `json:"error_msg"`
 }
-func Cmd(c *gin.Context)  {
+
+func Cmd(c *gin.Context) {
 	input := CmdReq{}
 	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
 		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
 		return
 	}
 
-	data,_ := json.Marshal(input)
+	if input.CmdType == "start_arm" || input.CmdType == "stop_arm" {
+		log.LogNotice(map[string]interface{}{"input":input})
+	} else {
+		data, _ := json.Marshal(input)
 
-	resp,err := util.Post(conf.Config.PlatformApi.Host+"/v1/cmd",data, map[string]string{}, map[string]string{})
-	if err != nil{
-		response.Fail(c, consts.REQUEST_FAIL_CODE, consts.REQUEST_FAIL.Error())
-		return
+		resp, err := util.Post(conf.Config.PlatformApi.Host+"/v1/cmd", data, map[string]string{}, map[string]string{})
+		if err != nil {
+			response.Fail(c, consts.REQUEST_FAIL_CODE, consts.REQUEST_FAIL.Error())
+			return
+		}
+		apiResp := CmdResp{}
+		err = json.Unmarshal(resp, &apiResp)
+		if err != nil {
+			response.Fail(c, consts.REQUEST_FAIL_CODE, consts.REQUEST_FAIL.Error())
+			return
+		}
+		if apiResp.ErrorCode != 0 {
+			response.Fail(c, consts.REQUEST_FAIL_CODE, apiResp.ErrorMsg)
+			return
+		}
 	}
-	apiResp := CmdResp{}
-	err = json.Unmarshal(resp,&apiResp)
-	if err != nil{
-		response.Fail(c, consts.REQUEST_FAIL_CODE, consts.REQUEST_FAIL.Error())
-		return
-	}
-	if apiResp.ErrorCode != 0 {
-		response.Fail(c, consts.REQUEST_FAIL_CODE, apiResp.ErrorMsg)
-		return
-	}
-	response.Success(c,nil)
+	response.Success(c, nil)
 }
-
 
 type ReportReq struct {
 	EventType string `json:"event_type"`
@@ -536,6 +543,59 @@ func Start(c *gin.Context)  {
 		response.Fail(c, consts.DB_EXEC_ERR_CODE, consts.DB_EXEC_ERR.Error())
 		return
 	}
+	response.Success(c,nil)
+}
 
+func ArmList(c *gin.Context)  {
+	arms := []models.Arm{}
+	db.DB().Table("arm").AutoMigrate(models.Arm{})
+	db.DB().Table("arm").Find(&arms)
+	response.Success(c,arms)
+}
+
+type ArmCmdInfo struct {
+	BombNo         string `json:"bomb_no"`
+	Cnt            int64  `json:"cnt"`
+	MajorProgramNo string `json:"major_program_no"`
+	PlanEndTime    string `json:"plan_end_time"`
+	PlanStartTime  string `json:"plan_start_time"`
+	ProductionName string `json:"production_name"`
+	ProductionNo   string `json:"production_no"`
+}
+
+
+type ArmCmdInput []ArmCmdInfo
+func TaskIssue(c *gin.Context)  {
+	var input ArmCmdInput
+	if err := c.ShouldBindWith(&input, binding.JSON); err != nil {
+		response.Fail(c, consts.PARAM_ERR_CODE, consts.PARAM_ERR.Error())
+		return
+	}
+	data,_ := json.Marshal(input)
+	resp,err := httputil.Post(conf.Config.PlatformApi.Host+"/v1/task/issue",data, map[string]string{}, map[string]string{})
+	if err!= nil{
+		log.LogError(map[string]interface{}{"http post fail err ":err,"path":"/v1/task/issue"})
+		response.Fail(c,consts.REQUEST_FAIL_CODE,"http post fail err :"+ err.Error())
+		return
+	}
+
+	data,err = ioutil.ReadAll(resp.Body)
+	if err != nil{
+		response.Fail(c,consts.REQUEST_FAIL_CODE,"http post read data err :"+ err.Error())
+		return
+	}
+
+	cmdResp := CmdResp{}
+	err = json.Unmarshal(data,&cmdResp)
+	if err != nil{
+		response.Fail(c,consts.REQUEST_FAIL_CODE,"http post unmarshal data err : "+ err.Error() +  " data: "+string(data))
+		return
+	}
+	if cmdResp.ErrorCode != 0{
+			response.Fail(c,consts.REQUEST_FAIL_CODE,"http post resp data fail error : " + strconv.Itoa(cmdResp.ErrorCode)+" error_msg : " + cmdResp.ErrorMsg)
+			return
+	}
+
+	log.LogNotice(map[string]interface{}{"input":input})
 	response.Success(c,nil)
 }

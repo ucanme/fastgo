@@ -146,6 +146,8 @@ func V1(r gin.IRouter) {
 		g.POST("/production_line/forward",v1.Forward)
 		g.POST("/production_line/stop",v1.Stop)
 		g.POST("/production_line/start",v1.Start)
+		g.POST("/arm/list",v1.ArmList)
+		g.POST("/task/issue",v1.TaskIssue)
 	}
 }
 
